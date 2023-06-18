@@ -3,7 +3,7 @@ import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
-export default function WaitBlock({
+export default function FindBlock({
   data,
   isConnectable,
   selected,
@@ -30,7 +30,7 @@ export default function WaitBlock({
       <div
         onClick={() => {
           if (inputRef.current === null)
-            throw new Error("WaitBlock.onClick: inputRef.current is null");
+            throw new Error("FindBlock.onClick: inputRef.current is null");
           inputRef.current.focus();
         }}
         onMouseEnter={() => setMouseOver(true)}
@@ -40,7 +40,7 @@ export default function WaitBlock({
                   border-2 ${selected && "border-dashed"}`}
       >
         <BlockTitle
-          title="wait"
+          title="find"
           showRemoveBtn={mouseOver || selected}
           onRemove={() => {
             console.log("removed");
@@ -48,24 +48,24 @@ export default function WaitBlock({
         />
         <div className="flex justify-center pt-1.5">
           <Image
-            src="/wait-block-icon.svg"
+            src="/find-block-icon.svg"
             width={28}
             height={28}
-            alt="wait block icon"
+            alt="find block icon"
           />
         </div>
         <div className="flex mx-1 pt-1">
           <input
             ref={inputRef}
-            className="w-full font-mono bg-block block text-xs text-center focus:bg-board rounded-full outline-none"
+            className="w-full font-mono bg-block block text-xs text-center 
+                     focus:bg-board rounded-full outline-none nodrag"
             type="text"
             name="input-field"
             id="input-field"
-            placeholder="t"
+            placeholder="image"
             defaultValue={data.text}
             onChange={(event) => setText(event.target.value)}
           />
-          <span className="text-xs">sec</span>
         </div>
       </div>
       <Handle
@@ -74,6 +74,15 @@ export default function WaitBlock({
         position={Position.Right}
         id="b"
         isConnectable={isConnectable}
+        style={{ top: 10 }}
+      />
+      <Handle
+        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        type="source"
+        position={Position.Right}
+        id="c"
+        isConnectable={isConnectable}
+        style={{ bottom: 10, top: data.height - 10 }}
       />
     </>
   );

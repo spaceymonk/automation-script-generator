@@ -16,13 +16,14 @@ import Image from "next/image";
 import StartBlock from "../block-components/start-block";
 import ClickBlock from "../block-components/click-block";
 import WaitBlock from "../block-components/wait-block";
+import FindBlock from "../block-components/find-block";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const infoColor = "#1D3557";
 const snapGrid = [20, 20] as [number, number];
 const nodeTypes = {
   start: StartBlock,
-  find: StartBlock,
+  find: FindBlock,
   click: ClickBlock,
   wait: WaitBlock,
 };
@@ -34,8 +35,7 @@ export default function Board() {
     useState<ReactFlowInstance | null>(null);
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
   const onConnect = useCallback(
-    (params: Connection) =>
-      setEdges((eds) => addEdge({ ...params}, eds)),
+    (params: Connection) => setEdges((eds) => addEdge({ ...params }, eds)),
     [setEdges]
   );
   const onEdgeUpdate = useCallback(
@@ -89,7 +89,7 @@ export default function Board() {
         id: Math.floor(Math.random() * 100).toString(),
         type,
         position,
-        data: { text: "" },
+        data: { text: "", width: 80, height: 80 },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -102,20 +102,26 @@ export default function Board() {
       {
         id: "1",
         type: "start",
-        data: null,
+        data: { text: "", width: 80, height: 80 },
         position: { x: 0, y: 0 },
       },
       {
         id: "2",
         type: "click",
-        data: { text: "" },
+        data: { text: "", width: 80, height: 80 },
         position: { x: 300, y: 0 },
       },
       {
         id: "3",
         type: "wait",
-        data: { text: "" },
+        data: { text: "", width: 80, height: 80 },
         position: { x: 300, y: 300 },
+      },
+      {
+        id: "4",
+        type: "find",
+        data: { text: "", width: 80, height: 80 },
+        position: { x: 0, y: 300 },
       },
     ]);
   }, []);
@@ -190,6 +196,18 @@ export default function Board() {
                     width={60}
                     height={60}
                     alt="wait block"
+                  ></Image>
+                </div>
+                <div
+                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+                  draggable
+                  onDragStart={(event) => onDragStart(event, "find")}
+                >
+                  <Image
+                    src="/find-block.png"
+                    width={60}
+                    height={60}
+                    alt="find block"
                   ></Image>
                 </div>
               </div>
