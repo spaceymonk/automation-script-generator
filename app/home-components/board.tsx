@@ -1,8 +1,12 @@
 import ReactFlow, {
   Background,
   BackgroundVariant,
+  Connection,
   ConnectionLineType,
+  Edge,
+  MarkerType,
   Panel,
+  ReactFlowInstance,
   addEdge,
   updateEdge,
   useEdgesState,
@@ -10,6 +14,7 @@ import ReactFlow, {
 } from "reactflow";
 import Image from "next/image";
 import StartBlock from "../block-components/start-block";
+import ClickBlock from "../block-components/click-block";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const infoColor = "#1D3557";
@@ -17,29 +22,31 @@ const snapGrid = [20, 20] as [number, number];
 const nodeTypes = {
   start: StartBlock,
   find: StartBlock,
-  click: StartBlock,
+  click: ClickBlock,
   wait: StartBlock,
 };
 
 export default function Board() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
-  const reactFlowWrapperRef = useRef<any>(null);
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance | null>(null);
+  const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
   const onConnect = useCallback(
-    (params: any) =>
-      setEdges((eds) => addEdge({ ...params, type: "smoothstep" }, eds)),
+    (params: Connection) =>
+      setEdges((eds) =>
+        addEdge(
+          { ...params, type: "smoothstep", markerEnd: MarkerType.ArrowClosed },
+          eds
+        )
+      ),
     [setEdges]
   );
   const onEdgeUpdate = useCallback(
-    (oldEdge: any, newConnection: any) =>
+    (oldEdge: Edge, newConnection: Connection) =>
       setEdges((els) => updateEdge(oldEdge, newConnection, els)),
     []
   );
-  const clearAnimations = useCallback(() => {
-    setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
-    setNodes((nodes) => nodes.map((n) => ({ ...n, selected: false })));
-  }, []);
 
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
@@ -76,6 +83,8 @@ export default function Board() {
         return;
       }
 
+      if (reactFlowInstance === null)
+        throw new Error("onDrop: reactFlowInstance is null");
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
@@ -84,7 +93,7 @@ export default function Board() {
         id: Math.floor(Math.random() * 100).toString(),
         type,
         position,
-        data: null,
+        data: { text: "" },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -99,6 +108,12 @@ export default function Board() {
         type: "start",
         data: null,
         position: { x: 0, y: 0 },
+      },
+      {
+        id: "2",
+        type: "click",
+        data: { text: "" },
+        position: { x: 300, y: 0 },
       },
     ]);
   }, []);
@@ -123,15 +138,7 @@ export default function Board() {
           proOptions={{ hideAttribution: true }}
           onDrop={onDrop}
           onDragOver={onDragOver}
-          onPaneClick={clearAnimations}
           onEdgeUpdate={onEdgeUpdate}
-          onSelectionChange={(params) => {
-            params.edges.forEach((edge) => {
-              setEdges((edges) =>
-                edges.map((e) => ({ ...e, animated: edge.selected }))
-              );
-            });
-          }}
           // TODO: add double click to fit-view
           zoomOnDoubleClick={false}
           fitView
@@ -153,6 +160,18 @@ export default function Board() {
                     width={60}
                     height={60}
                     alt="start block"
+                  ></Image>
+                </div>
+                <div
+                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+                  draggable
+                  onDragStart={(event) => onDragStart(event, "click")}
+                >
+                  <Image
+                    src="/click-block.png"
+                    width={60}
+                    height={60}
+                    alt="click block"
                   ></Image>
                 </div>
               </div>
