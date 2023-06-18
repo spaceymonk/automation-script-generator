@@ -20,12 +20,11 @@ export default function StartBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         className={`bg-block text-info border-info font-mono rounded-md
-                  w-20 h-20 border-2 ${selected && "contrast-75 shadow-lg"}
-                  transition-all duration-75 ease-in-out hover:drop-shadow-lg`}
+                  w-20 h-20 border-2 hover:drop-shadow-lg  ${selected && "border-dashed"}`}
       >
         <BlockTitle
           title="start"
-          showRemoveBtn={mouseOver}
+          showRemoveBtn={mouseOver || selected}
           onRemove={() => {
             console.log("removed");
           }}
@@ -40,7 +39,7 @@ export default function StartBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse shadow-lg"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"}`}
         type="source"
         position={Position.Right}
         id="a"

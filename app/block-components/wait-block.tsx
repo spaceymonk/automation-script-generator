@@ -3,7 +3,7 @@ import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
-export default function ClickBlock({
+export default function WaitBlock({
   data,
   isConnectable,
   selected,
@@ -21,7 +21,7 @@ export default function ClickBlock({
   return (
     <>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse shadow-lg"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"}`}
         type="target"
         position={Position.Left}
         id="a"
@@ -30,7 +30,7 @@ export default function ClickBlock({
       <div
         onClick={() => {
           if (inputRef.current === null)
-            throw new Error("ClickBlock.onClick: inputRef.current is null");
+            throw new Error("WaitBlock.onClick: inputRef.current is null");
           inputRef.current.focus();
         }}
         onMouseEnter={() => setMouseOver(true)}
@@ -39,35 +39,36 @@ export default function ClickBlock({
                   w-20 h-20 border-2 ${selected && "border-dashed"}`}
       >
         <BlockTitle
-          title="click"
+          title="wait"
           showRemoveBtn={mouseOver || selected}
           onRemove={() => {
             console.log("removed");
           }}
         />
-        <div className="flex justify-center pt-1">
+        <div className="flex justify-center pt-1.5">
           <Image
-            src="/click-block-icon.svg"
-            width={32}
-            height={31}
-            alt="click block icon"
+            src="/wait-block-icon.svg"
+            width={28}
+            height={28}
+            alt="wait block icon"
           />
         </div>
-        <div className="flex mx-1 pt-0.5 ">
+        <div className="flex mx-1 pt-1">
           <input
             ref={inputRef}
             className="w-full font-mono bg-block block text-xs text-center focus:bg-board rounded-full outline-none"
             type="text"
             name="input-field"
             id="input-field"
-            placeholder="x, y"
+            placeholder="t"
             defaultValue={data.text}
             onChange={(event) => setText(event.target.value)}
           />
+          <span className="text-xs">sec</span>
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse shadow-lg"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"}`}
         type="source"
         position={Position.Right}
         id="b"

@@ -13,7 +13,7 @@ export default function BlockTitle({
   // TODO: make button appering animated
   return (
     <div
-      className={`flex w-full justify-${
+      className={`text-xs flex w-full justify-${
         showRemoveBtn ? "between" : "center"
       } items-center`}
 

@@ -15,6 +15,7 @@ import ReactFlow, {
 import Image from "next/image";
 import StartBlock from "../block-components/start-block";
 import ClickBlock from "../block-components/click-block";
+import WaitBlock from "../block-components/wait-block";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const infoColor = "#1D3557";
@@ -23,7 +24,7 @@ const nodeTypes = {
   start: StartBlock,
   find: StartBlock,
   click: ClickBlock,
-  wait: StartBlock,
+  wait: WaitBlock,
 };
 
 export default function Board() {
@@ -34,12 +35,7 @@ export default function Board() {
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
   const onConnect = useCallback(
     (params: Connection) =>
-      setEdges((eds) =>
-        addEdge(
-          { ...params, type: "smoothstep", markerEnd: MarkerType.ArrowClosed },
-          eds
-        )
-      ),
+      setEdges((eds) => addEdge({ ...params}, eds)),
     [setEdges]
   );
   const onEdgeUpdate = useCallback(
@@ -115,6 +111,12 @@ export default function Board() {
         data: { text: "" },
         position: { x: 300, y: 0 },
       },
+      {
+        id: "3",
+        type: "wait",
+        data: { text: "" },
+        position: { x: 300, y: 300 },
+      },
     ]);
   }, []);
 
@@ -130,6 +132,10 @@ export default function Board() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          defaultEdgeOptions={{
+            markerEnd: MarkerType.Arrow,
+            type: "smoothstep",
+          }}
           onInit={setReactFlowInstance}
           connectionLineType={ConnectionLineType.SmoothStep}
           nodeTypes={nodeTypes}
@@ -172,6 +178,18 @@ export default function Board() {
                     width={60}
                     height={60}
                     alt="click block"
+                  ></Image>
+                </div>
+                <div
+                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+                  draggable
+                  onDragStart={(event) => onDragStart(event, "wait")}
+                >
+                  <Image
+                    src="/wait-block.png"
+                    width={60}
+                    height={60}
+                    alt="wait block"
                   ></Image>
                 </div>
               </div>
