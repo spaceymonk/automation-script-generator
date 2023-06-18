@@ -1,10 +1,16 @@
-import Image from "next/image";
+'use client'
+import 'reactflow/dist/style.css';
+
+import Board from "./home-components/board";
+import ButtonGroup from "./home-components/button-group";
+import Title from "./home-components/title";
 
 export default function Home() {
   return (
-    <div>
-      <h1 className="font-medium">automation script generator</h1>
-      <h2>v1.0</h2>
+    <div className="bg-app flex flex-col h-screen">
+      <Title />
+      <Board />
+      <ButtonGroup />
     </div>
   );
 }
