@@ -17,8 +17,10 @@ import StartBlock from "../block-components/start-block";
 import ClickBlock from "../block-components/click-block";
 import WaitBlock from "../block-components/wait-block";
 import FindBlock from "../block-components/find-block";
+import CustomEdge from "../block-components/custom-edge";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const lineColor = "#457B9D";
 const infoColor = "#1D3557";
 const snapGrid = [20, 20] as [number, number];
 const nodeTypes = {
@@ -26,6 +28,9 @@ const nodeTypes = {
   find: FindBlock,
   click: ClickBlock,
   wait: WaitBlock,
+};
+const edgeTypes = {
+  custom: CustomEdge,
 };
 
 export default function Board() {
@@ -35,7 +40,7 @@ export default function Board() {
     useState<ReactFlowInstance | null>(null);
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge({ ...params }, eds)),
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
   const onEdgeUpdate = useCallback(
@@ -139,12 +144,20 @@ export default function Board() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           defaultEdgeOptions={{
-            markerEnd: MarkerType.Arrow,
-            type: "smoothstep",
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: lineColor,
+            },
+            style: {
+              strokeWidth: 2,
+              stroke: lineColor,
+            },
+            type: "custom",
           }}
           onInit={setReactFlowInstance}
           connectionLineType={ConnectionLineType.SmoothStep}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           snapToGrid={true}
           snapGrid={snapGrid}
           proOptions={{ hideAttribution: true }}

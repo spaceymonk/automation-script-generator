@@ -23,7 +23,7 @@ export default function BlockTitle({
       </div>
       {showRemoveBtn && (
         <button className="ml-auto mr-2 bg-block rounded-full text-right " onClick={onRemove}>
-          <Image src="/remove.svg" width={8} height={8} alt="remove" />
+          <Image priority src="/remove.svg" width={8} height={8} alt="remove" />
         </button>
       )}
     </div>
