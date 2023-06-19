@@ -36,7 +36,7 @@ export default function WaitBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info border-info font-mono rounded-md
+        className={`bg-block text-info border-info font-mono rounded-sm
                   border-2 ${selected && "border-dashed"}`}
       >
         <BlockTitle
@@ -57,7 +57,7 @@ export default function WaitBlock({
         <div className="flex mx-1 pt-1">
           <input
             ref={inputRef}
-            className="w-full font-mono bg-block block text-xs text-center focus:bg-board rounded-full outline-none"
+            className="w-full font-mono bg-block block text-xs text-center focus:bg-board rounded-full outline-none nodrag"
             type="text"
             name="input-field"
             id="input-field"

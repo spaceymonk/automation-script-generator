@@ -15,14 +15,14 @@ export default function BlockTitle({
     <div
       className={`text-xs flex w-full justify-${
         showRemoveBtn ? "between" : "center"
-      } items-center`}
+      } items-center pt-0.5`}
 
     >
       <div className={`lowercase text-${showRemoveBtn ? "left ml-1" : "center mx-auto"}`}>
         {title}
       </div>
       {showRemoveBtn && (
-        <button className="ml-auto mr-2 bg-block rounded-full text-right " onClick={onRemove}>
+        <button className="ml-auto mr-2 bg-block rounded-full text-right hover:animate-pulse" onClick={onRemove}>
           <Image priority src="/remove.svg" width={8} height={8} alt="remove" />
         </button>
       )}

@@ -20,7 +20,7 @@ export default function StartBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info border-info font-mono rounded-md
+        className={`bg-block text-info border-info font-mono rounded-sm
                   border-2 hover:drop-shadow-lg  ${selected && "border-dashed"}`}
       >
         <BlockTitle

@@ -1,37 +1,31 @@
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
   Connection,
   ConnectionLineType,
   Edge,
-  MarkerType,
   Panel,
   ReactFlowInstance,
   addEdge,
   updateEdge,
   useEdgesState,
-  useNodesState,
+  useNodesState
 } from "reactflow";
-import Image from "next/image";
-import StartBlock from "../block-components/start-block";
-import ClickBlock from "../block-components/click-block";
-import WaitBlock from "../block-components/wait-block";
-import FindBlock from "../block-components/find-block";
-import CustomEdge from "../block-components/custom-edge";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  defaultEdgeMarkerEnd,
+  defaultEdgeStyle,
+  edgeTypes,
+  infoColor,
+  lineColor,
+  nodeHeight,
+  nodeTypes,
+  nodeWidth,
+  snapGrid,
+} from "../constants";
 
-const lineColor = "#457B9D";
-const infoColor = "#1D3557";
-const snapGrid = [20, 20] as [number, number];
-const nodeTypes = {
-  start: StartBlock,
-  find: FindBlock,
-  click: ClickBlock,
-  wait: WaitBlock,
-};
-const edgeTypes = {
-  custom: CustomEdge,
-};
+
 
 export default function Board() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -40,7 +34,20 @@ export default function Board() {
     useState<ReactFlowInstance | null>(null);
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => {
+      let strokeColor = lineColor;
+      if (params.sourceHandle === "find-false") strokeColor = "red";
+      if (params.sourceHandle === "find-true") strokeColor = "lime";
+      const edge = {
+        ...params,
+        markerEnd: {...defaultEdgeMarkerEnd},
+        style: {...defaultEdgeStyle},
+        type: 'custom'
+      };
+      edge.style.stroke = strokeColor;
+      edge.markerEnd.color = strokeColor;
+      setEdges((eds) => addEdge(edge, eds));
+    },
     [setEdges]
   );
   const onEdgeUpdate = useCallback(
@@ -87,14 +94,14 @@ export default function Board() {
       if (reactFlowInstance === null)
         throw new Error("onDrop: reactFlowInstance is null");
       const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+        x: event.clientX - (reactFlowBounds.left + nodeWidth),
+        y: event.clientY - (reactFlowBounds.top + nodeHeight),
       });
       const newNode = {
-        id: Math.floor(Math.random() * 100).toString(),
+        id: `id-${Math.floor(Math.random() * 100)}`,
         type,
         position,
-        data: { text: "", width: 80, height: 80 },
+        data: { text: "", width: nodeWidth, height: nodeHeight },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -143,19 +150,8 @@ export default function Board() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          defaultEdgeOptions={{
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: lineColor,
-            },
-            style: {
-              strokeWidth: 2,
-              stroke: lineColor,
-            },
-            type: "custom",
-          }}
           onInit={setReactFlowInstance}
-          connectionLineType={ConnectionLineType.SmoothStep}
+          connectionLineType={ConnectionLineType.Straight}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           snapToGrid={true}
@@ -164,11 +160,12 @@ export default function Board() {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onEdgeUpdate={onEdgeUpdate}
+          selectNodesOnDrag={false}
           // TODO: add double click to fit-view
           zoomOnDoubleClick={false}
           fitView
         >
-          <Background color={infoColor} variant={BackgroundVariant.Dots} />
+          <Background color={infoColor} gap={snapGrid} variant={BackgroundVariant.Dots} />
           <Panel style={{ margin: 0 }} position={"bottom-right"}>
             <div className="bg-app rounded-md px-4 py-3 mr-5 mb-5 drop-shadow-md">
               <h3 className="text-info text-center font-semibold underline uppercase font-sans mb-5 select-none">

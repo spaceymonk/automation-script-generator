@@ -36,7 +36,7 @@ export default function FindBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info border-info font-mono rounded-md
+        className={`bg-block text-info border-info font-mono rounded-sm
                   border-2 ${selected && "border-dashed"}`}
       >
         <BlockTitle
@@ -69,20 +69,20 @@ export default function FindBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        className={`border-0 ${selected && "animate-pulse"}`}
         type="source"
         position={Position.Right}
-        id="b"
+        id="find-true"
         isConnectable={isConnectable}
-        style={{ top: 10 }}
+        style={{ top: 10, backgroundColor: "lime" }}
       />
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        className={`border-0 ${selected && "animate-pulse"}`}
         type="source"
         position={Position.Right}
-        id="c"
+        id="find-false"
         isConnectable={isConnectable}
-        style={{ bottom: 10, top: data.height - 10 }}
+        style={{ bottom: 10, top: data.height - 10, backgroundColor: "red" }}
       />
     </>
   );
