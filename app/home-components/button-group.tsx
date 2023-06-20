@@ -1,3 +1,6 @@
+// TODO: write generate button logic
+// TODO: write about button logic
+
 export default function ButtonGroup() {
   return (
     <div className="my-4 mx-6 select-none">

@@ -11,9 +11,12 @@ export default function BlockTitle({
 }) {
   return (
     <div className={`text-xs flex w-full justify-center items-center pt-0.5`}>
-      <div className={`lowercase text-center mx-auto`}>{title}</div>
+      <div className={`lowercase transition-all ease-in-out duration-150 text-center mx-auto ${showRemoveBtn ? "" : "translate-x-4"}`}>{title}</div>
       <button
-        className={` transition-all ease-in-out duration-75 ml-auto mr-2 text-right hover:animate-bounce ${showRemoveBtn ? "opacity-100":"opacity-0"}`}
+        disabled={!showRemoveBtn}
+        className={`p-1 transition-all ease-in-out duration-150 ml-auto mr-2 text-right hover:animate-bounce ${
+          showRemoveBtn ? "opacity-100" : "-translate-x-4 opacity-0"
+        }`}
         onClick={onRemove}
       >
         <Image priority src="/remove.svg" width={10} height={10} alt="remove" />

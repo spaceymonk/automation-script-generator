@@ -16,7 +16,6 @@ export default function FindBlock({
   selected: boolean;
 }) {
   const { deleteElements, setNodes } = useReactFlow();
-  const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
 
@@ -46,15 +45,13 @@ export default function FindBlock({
             throw new Error("FindBlock.onClick: inputRef.current is null");
           inputRef.current.focus();
         }}
-        onMouseEnter={() => setMouseOver(true)}
-        onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
         className={`bg-block text-info ring-info/50 font-mono rounded-md
                   shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="find"
-          showRemoveBtn={mouseOver || selected}
+          showRemoveBtn={selected}
           onRemove={() => deleteElements({ nodes: [{ id }] })}
         />
         <div className="flex justify-center pt-1.5">
@@ -90,7 +87,7 @@ export default function FindBlock({
         style={{ top: nodeHeight / 4 }}
       />
       <Handle
-        className={`border-0 bg-red-400/90 ${
+        className={`border-0 bg-red-600/90 ${
           selected && "animate-pulse"
         } w-2 h-2`}
         type="source"

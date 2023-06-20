@@ -15,7 +15,6 @@ export default function ClickBlock({
   selected: boolean;
 }) {
   const { deleteElements, setNodes } = useReactFlow();
-  const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
 
@@ -47,15 +46,13 @@ export default function ClickBlock({
             throw new Error("ClickBlock.onClick: inputRef.current is null");
           inputRef.current.focus();
         }}
-        onMouseEnter={() => setMouseOver(true)}
-        onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
         className={`bg-block/90 text-info ring-info/50 font-mono rounded-md
                    shadow-sm ${selected && "ring-2 border-dashed"} transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="click"
-          showRemoveBtn={mouseOver || selected}
+          showRemoveBtn={selected}
           onRemove={() => deleteElements({ nodes: [{ id }] })}
         />
         <div className="flex justify-center pt-1">
