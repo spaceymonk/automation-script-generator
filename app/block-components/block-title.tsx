@@ -6,26 +6,18 @@ export default function BlockTitle({
   onRemove,
 }: {
   title: string;
-  showRemoveBtn: boolean
+  showRemoveBtn: boolean;
   onRemove: () => void;
 }) {
-
-  // TODO: make button appering animated
   return (
-    <div
-      className={`text-xs flex w-full justify-${
-        showRemoveBtn ? "between" : "center"
-      } items-center pt-0.5`}
-
-    >
-      <div className={`lowercase text-${showRemoveBtn ? "left ml-1" : "center mx-auto"}`}>
-        {title}
-      </div>
-      {showRemoveBtn && (
-        <button className="ml-auto mr-2 bg-block rounded-full text-right hover:animate-pulse" onClick={onRemove}>
-          <Image priority src="/remove.svg" width={8} height={8} alt="remove" />
-        </button>
-      )}
+    <div className={`text-xs flex w-full justify-center items-center pt-0.5`}>
+      <div className={`lowercase text-center mx-auto`}>{title}</div>
+      <button
+        className={` transition-all ease-in-out duration-75 ml-auto mr-2 text-right hover:animate-bounce ${showRemoveBtn ? "opacity-100":"opacity-0"}`}
+        onClick={onRemove}
+      >
+        <Image priority src="/remove.svg" width={10} height={10} alt="remove" />
+      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Handle, Position, useReactFlow } from "reactflow";
 import BlockTitle from "./block-title";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function WaitBlock({
   id,
@@ -14,17 +14,26 @@ export default function WaitBlock({
   isConnectable: boolean;
   selected: boolean;
 }) {
-  const { deleteElements } = useReactFlow();
+  const { deleteElements, setNodes } = useReactFlow();
   const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
 
-  // TODO: update input field changes to reactflow node array
+  useEffect(() => {
+    setNodes((nodes) =>
+      nodes.map((n) => {
+        if (n.id === id) {
+          n.data.text = text;
+        }
+        return n;
+      })
+    );
+  }, [text]);
 
   return (
     <>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}  w-3 h-3`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"}  w-2 h-2`}
         type="target"
         position={Position.Left}
         id="a"
@@ -39,8 +48,8 @@ export default function WaitBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info border-info font-mono rounded-sm
-                  border-2 ${selected && "border-dashed"} `}
+        className={`bg-block text-info ring-info/50 font-mono rounded-md
+                  shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="wait"
@@ -55,7 +64,7 @@ export default function WaitBlock({
             alt="wait block icon"
           />
         </div>
-        <div className="flex mx-1 pt-1">
+        <div className="flex mx-1 pt-2">
           <input
             ref={inputRef}
             className="w-full font-mono bg-block block text-xs text-center focus:bg-board rounded-full outline-none nodrag"
@@ -70,7 +79,7 @@ export default function WaitBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"} w-3 h-3`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
         type="source"
         position={Position.Right}
         id="b"

@@ -1,7 +1,7 @@
 import { Handle, Position, useReactFlow } from "reactflow";
 import BlockTitle from "./block-title";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { nodeHeight } from "../constants";
 
 export default function FindBlock({
@@ -15,17 +15,26 @@ export default function FindBlock({
   isConnectable: boolean;
   selected: boolean;
 }) {
-  const {deleteElements} = useReactFlow();
+  const { deleteElements, setNodes } = useReactFlow();
   const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
 
-  // TODO: update input field changes to reactflow node array
+  useEffect(() => {
+    setNodes((nodes) =>
+      nodes.map((n) => {
+        if (n.id === id) {
+          n.data.text = text;
+        }
+        return n;
+      })
+    );
+  }, [text]);
 
   return (
     <>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"} w-3 h-3`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
         type="target"
         position={Position.Left}
         id="a"
@@ -40,8 +49,8 @@ export default function FindBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info border-info font-mono rounded-sm
-                  border-2 ${selected && "border-dashed"}`}
+        className={`bg-block text-info ring-info/50 font-mono rounded-md
+                  shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="find"
@@ -56,7 +65,7 @@ export default function FindBlock({
             alt="find block icon"
           />
         </div>
-        <div className="flex mx-1 pt-1">
+        <div className="flex mx-1 pt-2">
           <input
             ref={inputRef}
             className="w-full font-mono bg-block block text-xs text-center 
@@ -71,15 +80,19 @@ export default function FindBlock({
         </div>
       </div>
       <Handle
-        className={`border-0 ${selected && "animate-pulse"} w-3 h-3`}
+        className={`border-0 bg-lime-400/90 ${
+          selected && "animate-pulse"
+        } w-2 h-2`}
         type="source"
         position={Position.Right}
         id="find-true"
         isConnectable={isConnectable}
-        style={{ top: nodeHeight / 4, backgroundColor: "lime" }}
+        style={{ top: nodeHeight / 4 }}
       />
       <Handle
-        className={`border-0 ${selected && "animate-pulse"} w-3 h-3`}
+        className={`border-0 bg-red-400/90 ${
+          selected && "animate-pulse"
+        } w-2 h-2`}
         type="source"
         position={Position.Right}
         id="find-false"
@@ -87,7 +100,6 @@ export default function FindBlock({
         style={{
           bottom: nodeHeight / 4,
           top: nodeHeight - nodeHeight / 4,
-          backgroundColor: "red",
         }}
       />
     </>

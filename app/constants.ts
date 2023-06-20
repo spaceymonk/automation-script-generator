@@ -9,6 +9,8 @@ export const nodeWidth = 80;
 export const nodeHeight = 80;
 export const lineColor = "#457B9D";
 export const infoColor = "#1D3557";
+export const lime400Color = "#a3e635";
+export const red400Color = "#f87171";
 
 export const snapGrid = [20, 20] as [number, number];
 export const nodeTypes = {

@@ -24,8 +24,8 @@ export default function StartBlock({
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info border-info font-mono rounded-sm
-                  border-2 ${selected && "border-dashed"}`}
+        className={`bg-block/90 text-info ring-info/50 font-mono rounded-md
+                  shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="start"
@@ -42,7 +42,7 @@ export default function StartBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}  w-3 h-3`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"}  w-2 h-2`}
         type="source"
         position={Position.Right}
         id="a"

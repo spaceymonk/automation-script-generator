@@ -18,10 +18,12 @@ import {
   defaultEdgeStyle,
   edgeTypes,
   infoColor,
+  lime400Color,
   lineColor,
   nodeHeight,
   nodeTypes,
   nodeWidth,
+  red400Color,
   snapGrid,
 } from "../constants";
 
@@ -33,9 +35,9 @@ export default function Board() {
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
   const onConnect = useCallback(
     (params: Connection) => {
-      let strokeColor = lineColor;
-      if (params.sourceHandle === "find-false") strokeColor = "red";
-      if (params.sourceHandle === "find-true") strokeColor = "lime";
+      let strokeColor = lineColor+'d9';
+      if (params.sourceHandle === "find-false") strokeColor = red400Color+'d9';
+      if (params.sourceHandle === "find-true") strokeColor = lime400Color+'d9';
       const edge = {
         ...params,
         markerEnd: { ...defaultEdgeMarkerEnd },

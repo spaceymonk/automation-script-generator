@@ -100,7 +100,7 @@ function EdgeRemoveBtn(
         className="nodrag nopan"
       >
         <button
-          className="flex text-center bg-board rounded-full hover:animate-pulse p-0.5"
+          className="flex text-center bg-board rounded-full hover:animate-bounce p-0.5"
           onClick={onEdgeClick}
         >
           <Image

@@ -14,7 +14,7 @@ module.exports = {
       },
       colors: {
         app: "#A8DADC",
-        board: "#E9E9E9",
+        board: "#E5E5E5",
         block: "#F1FAEE",
         info: "#1D3557",
         interact: "#E63946",
