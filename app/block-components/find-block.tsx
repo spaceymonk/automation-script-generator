@@ -1,17 +1,21 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position, useReactFlow } from "reactflow";
 import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { nodeHeight } from "../constants";
 
 export default function FindBlock({
+  id,
   data,
   isConnectable,
   selected,
 }: {
+  id: string;
   data: Record<string, any>;
   isConnectable: boolean;
   selected: boolean;
 }) {
+  const {deleteElements} = useReactFlow();
   const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
@@ -21,7 +25,7 @@ export default function FindBlock({
   return (
     <>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"} w-3 h-3`}
         type="target"
         position={Position.Left}
         id="a"
@@ -42,9 +46,7 @@ export default function FindBlock({
         <BlockTitle
           title="find"
           showRemoveBtn={mouseOver || selected}
-          onRemove={() => {
-            console.log("removed");
-          }}
+          onRemove={() => deleteElements({ nodes: [{ id }] })}
         />
         <div className="flex justify-center pt-1.5">
           <Image
@@ -69,20 +71,24 @@ export default function FindBlock({
         </div>
       </div>
       <Handle
-        className={`border-0 ${selected && "animate-pulse"}`}
+        className={`border-0 ${selected && "animate-pulse"} w-3 h-3`}
         type="source"
         position={Position.Right}
         id="find-true"
         isConnectable={isConnectable}
-        style={{ top: 10, backgroundColor: "lime" }}
+        style={{ top: nodeHeight / 4, backgroundColor: "lime" }}
       />
       <Handle
-        className={`border-0 ${selected && "animate-pulse"}`}
+        className={`border-0 ${selected && "animate-pulse"} w-3 h-3`}
         type="source"
         position={Position.Right}
         id="find-false"
         isConnectable={isConnectable}
-        style={{ bottom: 10, top: data.height - 10, backgroundColor: "red" }}
+        style={{
+          bottom: nodeHeight / 4,
+          top: nodeHeight - nodeHeight / 4,
+          backgroundColor: "red",
+        }}
       />
     </>
   );

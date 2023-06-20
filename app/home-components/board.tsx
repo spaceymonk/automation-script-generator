@@ -11,7 +11,7 @@ import ReactFlow, {
   addEdge,
   updateEdge,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from "reactflow";
 import {
   defaultEdgeMarkerEnd,
@@ -24,8 +24,6 @@ import {
   nodeWidth,
   snapGrid,
 } from "../constants";
-
-
 
 export default function Board() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -40,9 +38,9 @@ export default function Board() {
       if (params.sourceHandle === "find-true") strokeColor = "lime";
       const edge = {
         ...params,
-        markerEnd: {...defaultEdgeMarkerEnd},
-        style: {...defaultEdgeStyle},
-        type: 'custom'
+        markerEnd: { ...defaultEdgeMarkerEnd },
+        style: { ...defaultEdgeStyle },
+        type: "custom",
       };
       edge.style.stroke = strokeColor;
       edge.markerEnd.color = strokeColor;
@@ -138,6 +136,12 @@ export default function Board() {
     ]);
   }, []);
 
+  const onPaneClick = (event: React.MouseEvent) => {
+    if (event.detail === 2) {
+      event.preventDefault();
+      reactFlowInstance?.fitView();
+    }
+  };
   return (
     <div className="h-full w-full px-6">
       <div
@@ -161,11 +165,15 @@ export default function Board() {
           onDragOver={onDragOver}
           onEdgeUpdate={onEdgeUpdate}
           selectNodesOnDrag={false}
-          // TODO: add double click to fit-view
+          onPaneClick={onPaneClick}
           zoomOnDoubleClick={false}
           fitView
         >
-          <Background color={infoColor} gap={snapGrid} variant={BackgroundVariant.Dots} />
+          <Background
+            color={infoColor}
+            gap={snapGrid}
+            variant={BackgroundVariant.Dots}
+          />
           <Panel style={{ margin: 0 }} position={"bottom-right"}>
             <div className="bg-app rounded-md px-4 py-3 mr-5 mb-5 drop-shadow-md">
               <h3 className="text-info text-center font-semibold underline uppercase font-sans mb-5 select-none">

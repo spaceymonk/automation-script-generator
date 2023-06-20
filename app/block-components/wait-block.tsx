@@ -1,17 +1,20 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position, useReactFlow } from "reactflow";
 import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
 export default function WaitBlock({
+  id,
   data,
   isConnectable,
   selected,
 }: {
+  id: string;
   data: Record<string, any>;
   isConnectable: boolean;
   selected: boolean;
 }) {
+  const { deleteElements } = useReactFlow();
   const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
@@ -21,7 +24,7 @@ export default function WaitBlock({
   return (
     <>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"}  w-3 h-3`}
         type="target"
         position={Position.Left}
         id="a"
@@ -37,14 +40,12 @@ export default function WaitBlock({
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
         className={`bg-block text-info border-info font-mono rounded-sm
-                  border-2 ${selected && "border-dashed"}`}
+                  border-2 ${selected && "border-dashed"} `}
       >
         <BlockTitle
           title="wait"
           showRemoveBtn={mouseOver || selected}
-          onRemove={() => {
-            console.log("removed");
-          }}
+          onRemove={() => deleteElements({ nodes: [{ id }] })}
         />
         <div className="flex justify-center pt-1.5">
           <Image
@@ -69,7 +70,7 @@ export default function WaitBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"} w-3 h-3`}
         type="source"
         position={Position.Right}
         id="b"

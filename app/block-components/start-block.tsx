@@ -1,17 +1,21 @@
-import { Handle, Position } from "reactflow";
-import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useState } from "react";
+import { Handle, Position, useReactFlow } from "reactflow";
+import BlockTitle from "./block-title";
 
 export default function StartBlock({
+  id,
   data,
   isConnectable,
   selected,
 }: {
+  id: string;
   data: Record<string, any>;
   isConnectable: boolean;
   selected: boolean;
 }) {
+  const { deleteElements } = useReactFlow();
+
   const [mouseOver, setMouseOver] = useState(false);
 
   return (
@@ -21,14 +25,12 @@ export default function StartBlock({
         onMouseLeave={() => setMouseOver(false)}
         style={{ width: data.width, height: data.height }}
         className={`bg-block text-info border-info font-mono rounded-sm
-                  border-2 hover:drop-shadow-lg  ${selected && "border-dashed"}`}
+                  border-2 ${selected && "border-dashed"}`}
       >
         <BlockTitle
           title="start"
           showRemoveBtn={mouseOver || selected}
-          onRemove={() => {
-            console.log("removed");
-          }}
+          onRemove={() => deleteElements({ nodes: [{ id }] })}
         />
         <div className="flex justify-center py-2">
           <Image
@@ -40,7 +42,7 @@ export default function StartBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse"}`}
+        className={`bg-line border-0 ${selected && "animate-pulse"}  w-3 h-3`}
         type="source"
         position={Position.Right}
         id="a"

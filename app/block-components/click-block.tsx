@@ -1,17 +1,20 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position, useReactFlow } from "reactflow";
 import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
 export default function ClickBlock({
+  id,
   data,
   isConnectable,
   selected,
 }: {
+  id: string;
   data: Record<string, any>;
   isConnectable: boolean;
   selected: boolean;
 }) {
+  const { deleteElements } = useReactFlow();
   const [mouseOver, setMouseOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(data.text);
@@ -21,7 +24,9 @@ export default function ClickBlock({
   return (
     <>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse shadow-lg"}`}
+        className={`bg-line border-0 ${
+          selected && "animate-pulse shadow-lg"
+        } w-3 h-3`}
         type="target"
         position={Position.Left}
         id="a"
@@ -42,9 +47,7 @@ export default function ClickBlock({
         <BlockTitle
           title="click"
           showRemoveBtn={mouseOver || selected}
-          onRemove={() => {
-            console.log("removed");
-          }}
+          onRemove={() => deleteElements({ nodes: [{ id }] })}
         />
         <div className="flex justify-center pt-1">
           <Image
@@ -68,7 +71,9 @@ export default function ClickBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line border-0 ${selected && "animate-pulse shadow-lg"}`}
+        className={`bg-line border-0 ${
+          selected && "animate-pulse shadow-lg"
+        } w-3 h-3`}
         type="source"
         position={Position.Right}
         id="b"
