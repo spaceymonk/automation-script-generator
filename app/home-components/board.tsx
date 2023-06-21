@@ -18,7 +18,7 @@ import {
   defaultEdgeStyle,
   edgeTypes,
   infoColor,
-  lime400Color,
+  green600Color,
   lineColor,
   nodeHeight,
   nodeTypes,
@@ -40,15 +40,13 @@ export default function Board() {
       if (params.sourceHandle === "find-false")
         strokeColor = red600Color + opacity;
       if (params.sourceHandle === "find-true")
-        strokeColor = lime400Color + opacity;
+        strokeColor = green600Color + opacity;
       const edge = {
         ...params,
-        markerEnd: { ...defaultEdgeMarkerEnd },
-        style: { ...defaultEdgeStyle },
+        markerEnd: { ...defaultEdgeMarkerEnd, color: strokeColor },
+        style: { ...defaultEdgeStyle, stroke:strokeColor },
         type: "custom",
-      };
-      edge.style.stroke = strokeColor;
-      edge.markerEnd.color = strokeColor;
+      } as Edge;
       setEdges((eds) => addEdge(edge, eds));
     },
     [setEdges]

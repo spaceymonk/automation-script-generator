@@ -77,7 +77,7 @@ export default function FindBlock({
         </div>
       </div>
       <Handle
-        className={`border-0 bg-lime-400/90 ${
+        className={`border-0 bg-green-600/90 ${
           selected && "animate-pulse"
         } w-2 h-2`}
         type="source"

@@ -1,8 +1,6 @@
 // TODO: write generate button logic
 // TODO: write about button logic
 
-import "./about-modal.css";
-
 import { useState } from "react";
 import Modal from "react-modal";
 
@@ -14,7 +12,7 @@ export default function ButtonGroup() {
       <div className="my-4 mx-6 select-none">
         <button
           className="bg-interact text-white capitalize border-2 border-interact rounded-xl
-                    transition duration-150 ease-in-out px-6 py-1 mr-4 
+                    transition duration-150 ease-in-out px-6 py-1 mr-4 outline-none
                     hover:contrast-50"
         >
           generate
@@ -22,7 +20,7 @@ export default function ButtonGroup() {
         <button
           onClick={() => setShowModal(true)}
           className="bg-app text-interact capitalize border-2 border-interact rounded-xl
-                    transition duration-150 ease-in-out px-6 py-1
+                    transition duration-150 ease-in-out px-6 py-1 outline-none
                     hover:bg-interact hover:text-white hover:contrast-50"
         >
           about
@@ -32,7 +30,7 @@ export default function ButtonGroup() {
         isOpen={showModal}
         onRequestClose={() => setShowModal(false)}
         closeTimeoutMS={150}
-        className="bg-app text-info font-sans rounded-2xl text-center mx-8 w-fit  md:w-96 p-5 drop-shadow-lg select-none"
+        className="bg-app text-info font-sans rounded-2xl text-center mx-8 w-fit  md:w-96 p-5 drop-shadow-lg select-none outline-none"
       >
         <h2 className="text-info text-center font-bold text-xl underline uppercase font-sans mb-5">
           about
