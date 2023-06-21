@@ -1,7 +1,7 @@
-import { Handle, Position, useReactFlow } from "reactflow";
-import BlockTitle from "./block-title";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { Handle, Position, useReactFlow } from "reactflow";
+import BlockTitle from "./block-title";
 
 export default function ClickBlock({
   id,
@@ -32,9 +32,7 @@ export default function ClickBlock({
   return (
     <>
       <Handle
-        className={`bg-line/90 border-0 ${
-          selected && "animate-pulse shadow-lg"
-        } w-2 h-2`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
         type="target"
         position={Position.Left}
         id="a"
@@ -48,7 +46,9 @@ export default function ClickBlock({
         }}
         style={{ width: data.width, height: data.height }}
         className={`bg-block/90 text-info ring-info/50 font-mono rounded-md
-                   shadow-sm ${selected && "ring-2 border-dashed"} transition-all duration-75 ease-in-out`}
+                   shadow-sm ${
+                     selected && "ring-2"
+                   } transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="click"
@@ -77,9 +77,7 @@ export default function ClickBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line/90 border-0 ${
-          selected && "animate-pulse shadow-lg"
-        } w-2 h-2`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
         type="source"
         position={Position.Right}
         id="b"

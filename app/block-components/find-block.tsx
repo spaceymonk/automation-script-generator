@@ -1,8 +1,8 @@
-import { Handle, Position, useReactFlow } from "reactflow";
-import BlockTitle from "./block-title";
 import Image from "next/image";
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Handle, Position, useReactFlow } from "reactflow";
 import { nodeHeight } from "../constants";
+import BlockTitle from "./block-title";
 
 export default function FindBlock({
   id,
@@ -46,8 +46,10 @@ export default function FindBlock({
           inputRef.current.focus();
         }}
         style={{ width: data.width, height: data.height }}
-        className={`bg-block text-info ring-info/50 font-mono rounded-md
-                  shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
+        className={`bg-block/90 text-info ring-info/50 font-mono rounded-md
+                  shadow-sm ${
+                    selected && "ring-2"
+                  } transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="find"
@@ -65,8 +67,7 @@ export default function FindBlock({
         <div className="flex mx-1 pt-2">
           <input
             ref={inputRef}
-            className="w-full font-mono bg-block block text-xs text-center 
-                     focus:bg-board rounded-full outline-none nodrag"
+            className="w-full font-mono bg-block block text-xs text-center focus:bg-board rounded-full outline-none nodrag"
             type="text"
             name="input-field"
             id="input-field"

@@ -38,10 +38,10 @@ export default function StartBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line/90 border-0 ${selected && "animate-pulse"}  w-2 h-2`}
+        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
         type="source"
         position={Position.Right}
-        id="a"
+        id="b"
         isConnectable={isConnectable}
       />
     </>
