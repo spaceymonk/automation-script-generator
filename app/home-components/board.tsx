@@ -1,3 +1,5 @@
+import "./context-menu.css";
+
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
@@ -14,6 +16,14 @@ import ReactFlow, {
   useNodesState,
 } from "reactflow";
 import {
+  Menu,
+  Item,
+  Separator,
+  Submenu,
+  useContextMenu,
+  ItemParams,
+} from "react-contexify";
+import {
   defaultEdgeMarkerEnd,
   defaultEdgeStyle,
   edgeTypes,
@@ -26,6 +36,8 @@ import {
   red600Color,
   snapGrid,
 } from "../constants";
+
+const MENU_ID = "context-menu-id";
 
 export default function Board() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -44,7 +56,7 @@ export default function Board() {
       const edge = {
         ...params,
         markerEnd: { ...defaultEdgeMarkerEnd, color: strokeColor },
-        style: { ...defaultEdgeStyle, stroke:strokeColor },
+        style: { ...defaultEdgeStyle, stroke: strokeColor },
         type: "custom",
       } as Edge;
       setEdges((eds) => addEdge(edge, eds));
@@ -57,58 +69,37 @@ export default function Board() {
     []
   );
 
-  const onDragStart = (
-    event: React.DragEvent<HTMLDivElement>,
-    nodeType: string
-  ) => {
-    if (event.dataTransfer === null)
-      throw new Error("onDragStart: event.dataTransfer is null");
-
-    event.dataTransfer.setData("application/reactflow", nodeType);
-    event.dataTransfer.effectAllowed = "move";
+  const { show } = useContextMenu({
+    id: MENU_ID,
+  });
+  const handleItemClick = ({
+    event,
+    props,
+    triggerEvent,
+    data: type,
+  }: ItemParams) => {
+    if (reactFlowWrapperRef.current === null)
+      throw new Error("onDragOver: reactFlowWrapperRef.current is null");
+    const reactFlowBounds = reactFlowWrapperRef.current.getBoundingClientRect();
+    if (reactFlowInstance === null)
+      throw new Error("onDrop: reactFlowInstance is null");
+    const position = reactFlowInstance.project({
+      x: triggerEvent.clientX - (reactFlowBounds.left + nodeWidth),
+      y: triggerEvent.clientY - (reactFlowBounds.top + nodeHeight),
+    });
+    const newNode = {
+      id: `id-${Math.floor(Math.random() * 100)}`,
+      type,
+      position,
+      data: { text: "", width: nodeWidth, height: nodeHeight },
+    };
+    setNodes((nds) => nds.concat(newNode));
   };
-  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    if (event.dataTransfer === null)
-      throw new Error("onDragOver: event.dataTransfer is null");
-    event.dataTransfer.dropEffect = "move";
-  }, []);
-
-  const onDrop = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-
-      if (reactFlowWrapperRef.current === null)
-        throw new Error("onDragOver: reactFlowWrapperRef.current is null");
-      const reactFlowBounds =
-        reactFlowWrapperRef.current.getBoundingClientRect();
-
-      if (event.dataTransfer === null)
-        throw new Error("onDrop: event.dataTransfer is null");
-      const type = event.dataTransfer.getData("application/reactflow");
-
-      // check if the dropped element is valid
-      if (typeof type === "undefined" || !type) {
-        return;
-      }
-
-      if (reactFlowInstance === null)
-        throw new Error("onDrop: reactFlowInstance is null");
-      const position = reactFlowInstance.project({
-        x: event.clientX - (reactFlowBounds.left + nodeWidth),
-        y: event.clientY - (reactFlowBounds.top + nodeHeight),
-      });
-      const newNode = {
-        id: `id-${Math.floor(Math.random() * 100)}`,
-        type,
-        position,
-        data: { text: "", width: nodeWidth, height: nodeHeight },
-      };
-
-      setNodes((nds) => nds.concat(newNode));
-    },
-    [reactFlowInstance]
-  );
+  const displayMenu = (e: React.MouseEvent) => {
+    show({
+      event: e,
+    });
+  };
 
   useEffect(() => {
     setNodes([
@@ -147,6 +138,60 @@ export default function Board() {
   };
   return (
     <div className="h-full w-full px-6">
+      <Menu id={MENU_ID} animation="scale">
+        <Item data="start" onClick={handleItemClick}>
+          <div
+            className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+            draggable
+          >
+            <Image
+              src="/start-block.png"
+              width={60}
+              height={60}
+              alt="start block"
+            ></Image>
+          </div>
+        </Item>
+        <Item data="click" onClick={handleItemClick}>
+          <div
+            className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+            draggable
+          >
+            <Image
+              src="/click-block.png"
+              width={60}
+              height={60}
+              alt="click block"
+            ></Image>
+          </div>
+        </Item>
+        <Item data="wait" onClick={handleItemClick}>
+          <div
+            className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+            draggable
+          >
+            <Image
+              src="/wait-block.png"
+              width={60}
+              height={60}
+              alt="wait block"
+            ></Image>
+          </div>
+        </Item>
+        <Item data="find" onClick={handleItemClick}>
+          <div
+            className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
+            draggable
+          >
+            <Image
+              src="/find-block.png"
+              width={60}
+              height={60}
+              alt="find block"
+            ></Image>
+          </div>
+        </Item>
+      </Menu>
       <div
         ref={reactFlowWrapperRef}
         className="bg-board w-full h-full rounded-xl"
@@ -164,11 +209,10 @@ export default function Board() {
           snapToGrid={true}
           snapGrid={snapGrid}
           proOptions={{ hideAttribution: true }}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
           onEdgeUpdate={onEdgeUpdate}
           selectNodesOnDrag={false}
           onPaneClick={onPaneClick}
+          onPaneContextMenu={displayMenu}
           zoomOnDoubleClick={false}
           fitView
         >
@@ -177,63 +221,6 @@ export default function Board() {
             gap={snapGrid}
             variant={BackgroundVariant.Dots}
           />
-          <Panel style={{ margin: 0 }} position={"bottom-right"}>
-            <div className="bg-app rounded-md px-4 py-3 mr-5 mb-5 drop-shadow-md">
-              <h3 className="text-info text-center font-semibold underline uppercase font-sans mb-5 select-none">
-                drag to add
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div
-                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
-                  draggable
-                  onDragStart={(event) => onDragStart(event, "start")}
-                >
-                  <Image
-                    src="/start-block.png"
-                    width={60}
-                    height={60}
-                    alt="start block"
-                  ></Image>
-                </div>
-                <div
-                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
-                  draggable
-                  onDragStart={(event) => onDragStart(event, "click")}
-                >
-                  <Image
-                    src="/click-block.png"
-                    width={60}
-                    height={60}
-                    alt="click block"
-                  ></Image>
-                </div>
-                <div
-                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
-                  draggable
-                  onDragStart={(event) => onDragStart(event, "wait")}
-                >
-                  <Image
-                    src="/wait-block.png"
-                    width={60}
-                    height={60}
-                    alt="wait block"
-                  ></Image>
-                </div>
-                <div
-                  className="transition-all ease-in-out duration-150 hover:contrast-75 cursor-pointer"
-                  draggable
-                  onDragStart={(event) => onDragStart(event, "find")}
-                >
-                  <Image
-                    src="/find-block.png"
-                    width={60}
-                    height={60}
-                    alt="find block"
-                  ></Image>
-                </div>
-              </div>
-            </div>
-          </Panel>
         </ReactFlow>
       </div>
     </div>
