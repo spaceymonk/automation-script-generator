@@ -122,6 +122,7 @@ export default function Board() {
           selectNodesOnDrag={false}
           onPaneClick={onPaneClick}
           onPaneContextMenu={displayMenu}
+          // TODO: add onNodeContextMenu to remove block
           zoomOnDoubleClick={false}
           fitView
         >
