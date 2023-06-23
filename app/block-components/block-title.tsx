@@ -15,7 +15,7 @@ export default function BlockTitle({
       <button
         disabled={!showRemoveBtn}
         className={`p-1 transition-all ease-in-out duration-150 ml-auto mr-2 text-right hover:animate-bounce ${
-          showRemoveBtn ? "opacity-100" : "-translate-x-4 opacity-0 cursor-grab"
+          showRemoveBtn ? "opacity-100 z-0" : "-translate-x-4 opacity-0 cursor-pointer -z-10"
         }`}
         onClick={onRemove}
       >
