@@ -32,7 +32,9 @@ export default function WaitBlock({
   return (
     <>
       <Handle
-        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
+         className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -left-2 ${
+          selected && "animate-pulse"
+        }`}
         type="target"
         position={Position.Left}
         id="a"
@@ -78,7 +80,9 @@ export default function WaitBlock({
         </div>
       </div>
       <Handle
-        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
+        className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -right-2 ${
+          selected && "animate-pulse"
+        }`}
         type="source"
         position={Position.Right}
         id="b"

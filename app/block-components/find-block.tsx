@@ -33,7 +33,9 @@ export default function FindBlock({
   return (
     <>
       <Handle
-        className={`bg-line/90 border-0 ${selected && "animate-pulse"} w-2 h-2`}
+        className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -left-2 ${
+          selected && "animate-pulse"
+        }`}
         type="target"
         position={Position.Left}
         id="a"
@@ -78,22 +80,22 @@ export default function FindBlock({
         </div>
       </div>
       <Handle
-        className={`border-0 bg-green-600/90 ${
+        className={`bg-green-600/90 border-1 border-block/90 rounded-sm w-3 h-5 -right-2 ${
           selected && "animate-pulse"
-        } w-2 h-2`}
+        }`}
         type="source"
         position={Position.Right}
-        id="find-true"
+        id="true"
         isConnectable={isConnectable}
         style={{ top: nodeHeight / 4 }}
       />
       <Handle
-        className={`border-0 bg-red-600/90 ${
+        className={`bg-red-600/90 border-1 border-block/90 rounded-sm w-3 h-5 -right-2 ${
           selected && "animate-pulse"
-        } w-2 h-2`}
+        }`}
         type="source"
         position={Position.Right}
-        id="find-false"
+        id="false"
         isConnectable={isConnectable}
         style={{
           bottom: nodeHeight / 4,

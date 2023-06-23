@@ -121,10 +121,10 @@ function getPath({
   let d5 = d1;
   let d3 = -(w + d5 + d1);
 
-  if (sourceHandleId === "find-false") {
+  if (sourceHandleId === "false") {
     d2 = Math.max(h / 2 - nodeHeight / 4, nodeHeight / 2);
     d4 = h - d2;
-  } else if (sourceHandleId === "find-true") {
+  } else if (sourceHandleId === "true") {
     d2 = Math.min(h / 2 + nodeHeight / 4, -nodeHeight / 2);
     d4 = h - d2;
   }
