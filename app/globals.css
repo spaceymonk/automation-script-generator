@@ -16,3 +16,7 @@
 .ReactModal__Overlay--before-close {
   @apply opacity-0;
 }
+
+:root {
+  --contexify-activeItem-bgColor: transparent!important;
+}
