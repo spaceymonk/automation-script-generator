@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Menu, Item, ItemParams } from "react-contexify";
+import { Item, ItemParams, Menu } from "react-contexify";
 
 export default function ContextMenu({
   onItemClick,

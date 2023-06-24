@@ -1,8 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import {
-  ItemParams,
-  contextMenu
-} from "react-contexify";
+import { ItemParams, contextMenu } from "react-contexify";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -13,7 +10,7 @@ import ReactFlow, {
   addEdge,
   updateEdge,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from "reactflow";
 import {
   defaultEdgeMarkerEnd,

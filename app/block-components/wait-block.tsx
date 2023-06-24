@@ -32,7 +32,7 @@ export default function WaitBlock({
   return (
     <>
       <Handle
-         className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -left-2 ${
+        className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -left-2 ${
           selected && "animate-pulse"
         }`}
         type="target"

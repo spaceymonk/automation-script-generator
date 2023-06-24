@@ -1,15 +1,16 @@
 import Modal from "react-modal";
 
 export function AboutModal({
-  showAboutModal, closeAboutModal,
+  show,
+  onClose,
 }: {
-  showAboutModal: boolean;
-  closeAboutModal: () => void;
+  show: boolean;
+  onClose: () => void;
 }) {
   return (
     <Modal
-      isOpen={showAboutModal}
-      onRequestClose={closeAboutModal}
+      isOpen={show}
+      onRequestClose={onClose}
       closeTimeoutMS={150}
       className="bg-app text-info font-sans rounded-2xl text-center mx-8 w-fit  md:w-96 p-5 drop-shadow-lg select-none outline-none"
     >
@@ -40,7 +41,7 @@ export function AboutModal({
       </p>
 
       <button
-        onClick={closeAboutModal}
+        onClick={onClose}
         className="bg-app text-interact capitalize border-2 border-interact rounded-xl
               transition duration-150 ease-in-out px-6 py-1
               hover:bg-interact hover:text-white hover:contrast-50"

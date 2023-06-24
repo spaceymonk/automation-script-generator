@@ -1,46 +1,70 @@
 import { useEffect, useState } from "react";
+import { Edge, Node, useReactFlow } from "reactflow";
 import { AboutModal } from "./about-modal";
+import { GenerateModal } from "./generate-modal";
+
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const generate = async (
+  nodes: Node<{ text: string }>[],
+  edges: Edge[],
+  callback: (text: string) => void
+) => {
+  // TODO: create python script from blocks
+  await timeout(1500);
+  callback(JSON.stringify({ nodes, edges }, null, 2));
+};
 
 export default function ButtonGroup() {
+  const { getNodes, getEdges } = useReactFlow();
+
   const [showAboutModal, setShowAboutModal] = useState(false);
-  const [showGenerateModal, setShowGenerateModal] = useState({
+  const [generateModalState, setGenerateModalState] = useState({
     request: false,
-    shouldOpen: false,
+    show: false,
+    text: "",
   });
 
   const closeAboutModal = () => setShowAboutModal(false);
   const openAboutModal = () => setShowAboutModal(true);
   const closeGenerateModal = () => {
-    setShowGenerateModal((prev) => ({ shouldOpen: false, request: false }));
+    setGenerateModalState((prev) => ({
+      ...prev,
+      request: false,
+      show: false,
+    }));
   };
   const openGenerateModal = () => {
-    // TODO: replace below async method to generate logic
-    const timer = setTimeout(
-      () => setShowGenerateModal((prev) => ({ ...prev, shouldOpen: true })),
-      1000
-    );
-    setShowGenerateModal((prev) => ({ ...prev, request: true }));
+    setGenerateModalState((prev) => ({ ...prev, show: false, request: true }));
+    generate(getNodes(), getEdges(), (text) => {
+      if (text === null || text.length === 0) {
+        throw new Error("generate.callback: code is empty or null.");
+      }
+      setGenerateModalState((prev) => ({ ...prev, text, show: true }));
+    });
   };
 
   useEffect(() => {
-    if (!showGenerateModal.request) {
-      setShowGenerateModal({ request: false, shouldOpen: false });
+    if (!generateModalState.request && generateModalState.show) {
+      closeGenerateModal();
     }
-  }, [showGenerateModal.request]);
+  }, [generateModalState.request, generateModalState.show]);
 
   return (
     <>
       <div className="my-4 mx-6 select-none flex items-center justify-start">
         <button
-          disabled={showGenerateModal.request}
+          disabled={generateModalState.request}
           onClick={openGenerateModal}
           className={`bg-interact text-white capitalize border-2 border-interact rounded-xl
                     transition duration-150 ease-in-out px-6 py-1 mr-4 outline-none text-center
-                    hover:contrast-50 disabled:contrast-50 w-28 h-9`}
+                    hover:contrast-50 disabled:contrast-50`}
         >
-          {showGenerateModal.request && !showGenerateModal.shouldOpen ? (
+          {generateModalState.request && !generateModalState.show ? (
             <svg
-              className="animate-spin h-full w-full text-white"
+              className="animate-spin h-6 min-w-max "
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -72,14 +96,11 @@ export default function ButtonGroup() {
           about
         </button>
       </div>
-      <AboutModal
-        showAboutModal={showAboutModal}
-        closeAboutModal={closeAboutModal}
-      />
-      {/* TODO: create GenerateModal */}
-      <AboutModal
-        showAboutModal={showGenerateModal.shouldOpen}
-        closeAboutModal={closeGenerateModal}
+      <AboutModal show={showAboutModal} onClose={closeAboutModal} />
+      <GenerateModal
+        show={generateModalState.show}
+        onClose={closeGenerateModal}
+        text={generateModalState.text}
       />
     </>
   );

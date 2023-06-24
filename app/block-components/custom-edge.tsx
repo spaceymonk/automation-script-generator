@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useCallback, useMemo } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -6,7 +7,6 @@ import {
   useReactFlow,
 } from "reactflow";
 import { nodeHeight, nodeWidth } from "../constants";
-import { useCallback, useMemo } from "react";
 
 export default function CustomEdge(props: EdgeProps) {
   const { deleteElements } = useReactFlow();

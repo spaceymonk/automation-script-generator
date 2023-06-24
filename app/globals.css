@@ -7,6 +7,7 @@
 .ReactModal__Overlay {
   @apply opacity-0 transition-opacity duration-150 ease-out flex justify-center backdrop-blur-md items-center;
   background-color: transparent !important;
+  padding: 1rem;
 }
 
 .ReactModal__Overlay--after-open {
@@ -18,5 +19,30 @@
 }
 
 :root {
-  --contexify-activeItem-bgColor: transparent!important;
+  --contexify-activeItem-bgColor: transparent !important;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #a8dadc;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 1rem;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-track-piece {
+  background: #e5e5e5;
+  border-radius: 1rem;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #a8dadc;
+  border-radius: 1rem;
+  border: 2px solid #e5e5e5;
 }

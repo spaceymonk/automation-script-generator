@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
 import BlockTitle from "./block-title";
 
@@ -21,7 +20,9 @@ export default function StartBlock({
       <div
         style={{ width: data.width, height: data.height }}
         className={`bg-block/90 text-info ring-info/50 font-mono rounded-md
-                  shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
+                  shadow-sm ${
+                    selected && "ring-2"
+                  } transition-all duration-75 ease-in-out`}
       >
         <BlockTitle
           title="start"
