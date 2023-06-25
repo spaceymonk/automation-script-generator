@@ -1,21 +1,8 @@
 import { useEffect, useState } from "react";
-import { Edge, Node, useReactFlow } from "reactflow";
+import { useReactFlow } from "reactflow";
 import { AboutModal } from "./about-modal";
 import { GenerateModal } from "./generate-modal";
-
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-const generate = async (
-  nodes: Node<{ text: string }>[],
-  edges: Edge[],
-  callback: (text: string) => void
-) => {
-  // TODO: create python script from blocks
-  await timeout(1500);
-  callback(JSON.stringify({ nodes, edges }, null, 2));
-};
+import { generate } from "./generate.util";
 
 export default function ButtonGroup() {
   const { getNodes, getEdges } = useReactFlow();
