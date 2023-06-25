@@ -25,12 +25,15 @@ export default function ButtonGroup() {
   };
   const openGenerateModal = () => {
     setGenerateModalState((prev) => ({ ...prev, show: false, request: true }));
-    generate(getNodes(), getEdges(), (text) => {
-      if (text === null || text.length === 0) {
-        throw new Error("generate.callback: code is empty or null.");
-      }
-      setGenerateModalState((prev) => ({ ...prev, text, show: true }));
-    });
+    generate(getNodes(), getEdges())
+      .then((text) =>
+        setGenerateModalState((prev) => ({ ...prev, text, show: true }))
+      )
+      .catch((reason) => {
+        console.error(reason);
+        // TODO: better handle generation fails
+        closeGenerateModal();
+      });
   };
 
   useEffect(() => {
