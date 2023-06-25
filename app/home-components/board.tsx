@@ -61,6 +61,7 @@ export default function Board() {
   );
   const handleItemClick = useCallback(
     ({ event, props, triggerEvent, data: type }: ItemParams) => {
+      contextMenu.hideAll();
       if (reactFlowWrapperRef.current === null)
         throw new Error("onDragOver: reactFlowWrapperRef.current is null");
       const reactFlowBounds =
@@ -68,8 +69,14 @@ export default function Board() {
       if (reactFlowInstance === null)
         throw new Error("onDrop: reactFlowInstance is null");
       const position = reactFlowInstance.project({
-        x: triggerEvent.clientX - (reactFlowBounds.left + nodeWidth),
-        y: triggerEvent.clientY - (reactFlowBounds.top + nodeHeight),
+        x:
+          triggerEvent.clientX -
+          (reactFlowBounds.left +
+            (nodeWidth * reactFlowInstance.getZoom()) / 2),
+        y:
+          triggerEvent.clientY -
+          (reactFlowBounds.top +
+            (nodeHeight * reactFlowInstance.getZoom()) / 2),
       });
       const newNode = {
         id: `block-${getId()}`,
