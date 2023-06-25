@@ -19,26 +19,46 @@ export const generate = async (
       reject(new Error("no entry point"));
     }
 
-    let code = "";
+    const path: { [key: string]: { code: string[]; leaf: boolean } } = {};
     entryPoints.forEach((entryPoint) => {
-      let current = entryPoint;
-      while (true) {
-        code += getBlockCode(current);
+      const ss = [entryPoint];
+      let current: Node;
+      path[entryPoint.id] = { code: [""], leaf: true };
+      while (ss.length > 0) {
+        current = ss.pop() as Node;
+
+        const lastIndex = path[current.id].code.length - 1;
+        path[current.id].code[lastIndex] += getBlockCode(current);
+
         const outgoers = getOutgoers(current, nodes, edges);
-        if (outgoers.length === 0) {
-          break;
-        }
-        current = outgoers[0];
+        path[current.id].leaf = outgoers.length === 0;
+
+        outgoers.forEach((n) => {
+          ss.push(n);
+          if (Object.keys(path).includes(n.id)) {
+            path[n.id].code = path[n.id].code.concat([
+              path[current.id].code[lastIndex].concat(),
+            ]);
+          } else {
+            path[n.id] = { code: path[current.id].code.concat(), leaf: true };
+          }
+        });
       }
     });
 
+    let code = "";
+    for (let id in path) {
+      if (path[id].leaf) {
+        path[id].code.forEach((c) => (code += c + "\n"));
+      }
+    }
     resolve(code);
   });
 };
 
 export const getBlockCode = (node: Node) => {
   // TODO: get actual python code
-  return `[${node.type?.toUpperCase()}(${node.data?.text.toUpperCase()})]\n`;
+  return `# ${node.type?.toUpperCase()}(${node.data?.text})\n`;
 };
 
 function timeout(ms: number) {
