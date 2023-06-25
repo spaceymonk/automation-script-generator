@@ -28,6 +28,8 @@ import {
 import ContextMenu from "./context-menu";
 
 const MENU_ID = "context-menu-id";
+let __id__ = 1;
+const getId = () => __id__++;
 
 export default function Board() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -70,7 +72,7 @@ export default function Board() {
         y: triggerEvent.clientY - (reactFlowBounds.top + nodeHeight),
       });
       const newNode = {
-        id: `id-${Math.floor(Math.random() * 100)}`,
+        id: `block-${getId()}`,
         type,
         position,
         data: { text: "", width: nodeWidth, height: nodeHeight },

@@ -19,13 +19,13 @@ export function GenerateModal({
       isOpen={show}
       onRequestClose={onClose}
       closeTimeoutMS={150}
-      className="bg-app text-info font-sans rounded-2xl m-4 overflow-auto p-5 max-h-full flex flex-col drop-shadow-lg outline-none"
+      className="bg-app text-info font-sans rounded-2xl m-4 p-5 max-h-full w-full max-w-3xl  flex flex-col drop-shadow-lg outline-none"
     >
       <h2 className="text-info text-center font-bold text-xl underline uppercase select-none font-sans mb-5">
         script
       </h2>
       <SyntaxHighlighter
-        className="rounded-lg bg-board mb-5 overflow-auto max-w-3xl"
+        className="rounded-lg bg-board mb-5 overflow-auto w-full "
         showLineNumbers
         language="python"
         style={vs}
@@ -33,6 +33,7 @@ export function GenerateModal({
       >
         {text}
       </SyntaxHighlighter>
+      
       <div className="text-right">
         <button
           onClick={onClose}
