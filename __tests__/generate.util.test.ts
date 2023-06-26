@@ -1,5 +1,6 @@
 import { Edge, Node } from "reactflow";
 import {
+  Path,
   generate,
   getBlockCode,
   getEntryPoints,
@@ -78,7 +79,7 @@ describe("[generate]", () => {
       ];
       const edges: Edge[] = [{ id: "e1", source: "n2", target: "n3" }];
 
-      await expect(generate(nodes, edges)).rejects.toThrowError(
+      await expect(generate(nodes, edges, true)).rejects.toThrowError(
         "no entry point"
       );
     });
@@ -92,7 +93,7 @@ describe("[generate]", () => {
       ];
       const edges: Edge[] = [{ id: "e1", source: "n2", target: "n3" }];
 
-      await expect(generate(nodes, edges)).rejects.toThrowError(
+      await expect(generate(nodes, edges, true)).rejects.toThrowError(
         "no entry point"
       );
     });
@@ -117,7 +118,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[1]);
       expected += getBlockCode(nodes[2]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
     test("resolves with multiple entry point data", async () => {
@@ -140,7 +141,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[1]);
       expected += getBlockCode(nodes[3]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
   });
 
@@ -164,7 +165,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[0]);
       expected += getBlockCode(nodes[2]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
     test("resolves forked from single start block with merged connection", async () => {
@@ -195,7 +196,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[3]);
       expected += getBlockCode(nodes[4]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
     test("resolves forked from multiple start block with no merged connection", async () => {
@@ -228,7 +229,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[3]);
       expected += getBlockCode(nodes[5]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
     test("resolves forked from multiple start block with merged connection (complex)", async () => {
@@ -275,7 +276,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[1]);
       expected += getBlockCode(nodes[2]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
     test("resolves forked from multiple start block with merged connection (simple)", async () => {
@@ -302,7 +303,7 @@ describe("[generate]", () => {
       expected += getBlockCode(nodes[2]);
       expected += getBlockCode(nodes[3]);
       expected += "\n";
-      await expect(generate(nodes, edges)).resolves.toBe(expected);
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
   });
 });

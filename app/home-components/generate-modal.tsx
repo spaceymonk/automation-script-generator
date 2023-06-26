@@ -29,7 +29,7 @@ export function GenerateModal({
         showLineNumbers
         language="python"
         style={vs}
-        lineNumberStyle={{ color: "#777" }}
+        lineNumberStyle={{ color: "#777", width:"7%" }}
       >
         {text}
       </SyntaxHighlighter>

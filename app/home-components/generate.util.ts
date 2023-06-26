@@ -1,5 +1,7 @@
 import { Edge, Node, getOutgoers } from "reactflow";
 
+export type Path = { [key: string]: { code: string[]; leaf: boolean } };
+
 export const getEntryPoints = (nodes: Node[], edges: Edge[]) =>
   Object.values(
     nodes
@@ -11,7 +13,8 @@ export const getEntryPoints = (nodes: Node[], edges: Edge[]) =>
 
 export const generate = async (
   nodes: Node[],
-  edges: Edge[]
+  edges: Edge[],
+  debugging?: boolean
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const entryPoints = getEntryPoints(nodes, edges);
@@ -19,7 +22,7 @@ export const generate = async (
       reject(new Error("no entry point"));
     }
 
-    const path: { [key: string]: { code: string[]; leaf: boolean } } = {};
+    const path: Path = {};
     entryPoints.forEach((entryPoint) => {
       const ss = [entryPoint];
       let current: Node;
@@ -46,21 +49,62 @@ export const generate = async (
       }
     });
 
-    let codeText = "";
-    for (let id in path) {
-      if (path[id].leaf) {
-        for (let code of path[id].code) {
-          codeText += code + "\n";
+    if (debugging) {
+      let codeText = "";
+      for (let id in path) {
+        if (path[id].leaf) {
+          for (let code of path[id].code) {
+            codeText += code + "\n";
+          }
         }
       }
+      resolve(codeText);
+    } else {
+      resolve(getCode(path));
     }
-    resolve(codeText);
   });
 };
 
-export const getBlockCode = (node: Node) => {
-  // TODO: get actual python code
-  return `# ${node.type?.toUpperCase()}(${node.data?.text})\n`;
+export const getBlockCode = (node: Node, indent = 1) => {
+  if (node.type === "start") {
+    return "";
+  }
+  if (node.type === "click") {
+    return `${" ".repeat(indent * 4)}pyautogui.click(${node.data?.text})\n`;
+  }
+  if (node.type === "wait") {
+    return `${" ".repeat(indent * 4)}time.sleep(${node.data?.text})\n`;
+  }
+  return `${" ".repeat(indent * 4)}# ${node.type?.toUpperCase()}(${
+    node.data?.text
+  })\n`;
+};
+
+const getCode = (path: Path) => {
+  let codeText = "import threading\nimport time\nimport pyautogui\n\n\n";
+
+  let forkCount = 1;
+  for (let id in path) {
+    if (path[id].leaf) {
+      for (let code of path[id].code) {
+        codeText += `def scenario_${forkCount}():\n`;
+        codeText += code + "\n";
+        forkCount++;
+      }
+    }
+  }
+
+  codeText += "if __name__ == '__main__':\n";
+  for (let i = 1; i < forkCount; i++) {
+    codeText += `    thread_scenario_${i} = threading.Thread(target=scenario_${i})\n`;
+  }
+  for (let i = 1; i < forkCount; i++) {
+    codeText += `    thread_scenario_${i}.start()\n`;
+  }
+  for (let i = 1; i < forkCount; i++) {
+    codeText += `    thread_scenario_${i}.join()\n`;
+  }
+  return codeText;
 };
 
 function timeout(ms: number) {
