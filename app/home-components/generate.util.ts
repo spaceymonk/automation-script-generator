@@ -35,24 +35,26 @@ export const generate = async (
 
         outgoers.forEach((n) => {
           ss.push(n);
-          if (Object.keys(path).includes(n.id)) {
-            path[n.id].code = path[n.id].code.concat([
-              path[current.id].code[lastIndex].concat(),
-            ]);
-          } else {
+          if (typeof path[n.id] === "undefined") {
             path[n.id] = { code: path[current.id].code.concat(), leaf: true };
+          } else {
+            path[n.id].code = path[n.id].code.concat(
+              path[current.id].code[lastIndex]
+            );
           }
         });
       }
     });
 
-    let code = "";
+    let codeText = "";
     for (let id in path) {
       if (path[id].leaf) {
-        path[id].code.forEach((c) => (code += c + "\n"));
+        for (let code of path[id].code) {
+          codeText += code + "\n";
+        }
       }
     }
-    resolve(code);
+    resolve(codeText);
   });
 };
 
