@@ -1,14 +1,8 @@
 import { Edge, Node } from "reactflow";
-import {
-  Path,
-  generate,
-  getBlockCode,
-  getEntryPoints,
-} from "../app/home-components/generate.util";
+import { generate, getBlockCode, getEntryPoints } from "../app/home-components/generate.util";
 
 describe("[getEntryPoint]", () => {
   test("should be empty", () => {
-    /* prettier-ignore */
     const nodes: Node[] = [
       { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
       { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -20,7 +14,6 @@ describe("[getEntryPoint]", () => {
   });
 
   test("should be 1 (separate start blocks)", () => {
-    /* prettier-ignore */
     const nodes: Node[] = [
       { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
       { id: "n2", type: "start", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -36,7 +29,6 @@ describe("[getEntryPoint]", () => {
   });
 
   test("should be 2 (separate start blocks)", () => {
-    /* prettier-ignore */
     const nodes: Node[] = [
       { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
       { id: "n2", type: "start", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -52,7 +44,6 @@ describe("[getEntryPoint]", () => {
   });
 
   test("should be 2 (separate start blocks combined)", () => {
-    /* prettier-ignore */
     const nodes: Node[] = [
       { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
       { id: "n2", type: "start", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -72,20 +63,16 @@ describe("[getEntryPoint]", () => {
 describe("[generate]", () => {
   describe("exceptions", () => {
     test("rejects no entry point (no start block)", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
         { id: "n3", type: "wait", position: { x: 0, y: 0 }, data: { text: "n3" } },
       ];
       const edges: Edge[] = [{ id: "e1", source: "n2", target: "n3" }];
 
-      await expect(generate(nodes, edges, true)).rejects.toThrowError(
-        "no entry point"
-      );
+      await expect(generate(nodes, edges, true)).rejects.toThrowError("no entry point");
     });
 
     test("rejects no entry point (start block present)", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -93,15 +80,12 @@ describe("[generate]", () => {
       ];
       const edges: Edge[] = [{ id: "e1", source: "n2", target: "n3" }];
 
-      await expect(generate(nodes, edges, true)).rejects.toThrowError(
-        "no entry point"
-      );
+      await expect(generate(nodes, edges, true)).rejects.toThrowError("no entry point");
     });
   });
 
   describe("no fork, no branch, no loop", () => {
     test("resolves with one entry point data", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -112,7 +96,6 @@ describe("[generate]", () => {
         { id: "e2", source: "n2", target: "n3" },
       ];
 
-      /* prettier-ignore */
       let expected = "";
       expected += getBlockCode(nodes[0]);
       expected += getBlockCode(nodes[1]);
@@ -122,7 +105,6 @@ describe("[generate]", () => {
     });
 
     test("resolves with multiple entry point data", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "start", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -147,7 +129,6 @@ describe("[generate]", () => {
 
   describe("forked, no branch, no loop", () => {
     test("resolves forked from single start block with no merged connection", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -169,7 +150,6 @@ describe("[generate]", () => {
     });
 
     test("resolves forked from single start block with merged connection", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -200,7 +180,6 @@ describe("[generate]", () => {
     });
 
     test("resolves forked from multiple start block with no merged connection", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -233,7 +212,6 @@ describe("[generate]", () => {
     });
 
     test("resolves forked from multiple start block with merged connection (complex)", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -280,7 +258,6 @@ describe("[generate]", () => {
     });
 
     test("resolves forked from multiple start block with merged connection (simple)", async () => {
-      /* prettier-ignore */
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "start", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -302,6 +279,30 @@ describe("[generate]", () => {
       expected += "\n";
       expected += getBlockCode(nodes[2]);
       expected += getBlockCode(nodes[3]);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+  });
+
+  describe("no fork, branched, no loop", () => {
+    test("resolves branched, one level, separate, left - right children", async () => {
+      const nodes: Node[] = [
+        { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
+        { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
+        { id: "n3", type: "click", position: { x: 0, y: 0 }, data: { text: "n3" } },
+        { id: "n4", type: "find", position: { x: 0, y: 0 }, data: { text: "n4" } },
+      ];
+      const edges: Edge[] = [
+        { id: "e1", source: "n4", target: "n2", sourceHandle: "true" },
+        { id: "e2", source: "n4", target: "n3", sourceHandle: "false" },
+        { id: "e3", source: "n1", target: "n4" },
+      ];
+
+      let expected = "";
+      expected += getBlockCode(nodes[3], 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += "    catch ImageNotFoundException:\n";
+      expected += getBlockCode(nodes[2], 2);
       expected += "\n";
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
