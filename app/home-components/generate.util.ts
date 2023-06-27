@@ -14,7 +14,7 @@ export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean
       reject(new Error("no entry point"));
     }
 
-    const closureMap = new Map<string, string[]>();
+    const closureMap = new Map<string, Set<string>>();
     const codeMap = new Map<string, string[]>();
     const leafSet = new Set<string>();
     entryPoints.forEach((entryPoint) => {
@@ -26,15 +26,76 @@ export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean
 
         const currentCodeList = codeMap.get(current.id) || [""];
         const lastIndex = currentCodeList.length - 1;
-        currentCodeList[lastIndex] += getBlockCode(current);
 
         const outgoers = getOutgoers(current, nodes, edges);
         if (outgoers.length === 0) {
           leafSet.add(current.id);
         }
 
+        let currentIndent = 1;
+        if (closureMap.has(current.id)) {
+          currentIndent = (closureMap.get(current.id) as Set<string>).size + 1;
+        }
+
         if (current.type === "find") {
+          const trueOuts = [] as Node[];
+          const falseOuts = [] as Node[];
+          outgoers.forEach((outgoer) => {
+            const fromTrueHandle = edges.some(
+              (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "true"
+            );
+            let temp = currentCodeList[lastIndex].concat();
+
+            if (fromTrueHandle) {
+              traverseTreeDFS(
+                outgoer,
+                (child) => {
+                  const childClosure = closureMap.get(child.id) || new Set();
+                  if (childClosure.has(current.id + "-false")) {
+                    childClosure.delete(current.id + "-false");
+                  } else {
+                    childClosure.add(current.id + "-true");
+                  }
+                  closureMap.set(child.id, childClosure);
+                },
+                nodes,
+                edges
+              );
+              temp += getTryExceptCode("try", currentIndent);
+              temp += getBlockCode(current, currentIndent + 1);
+              trueOuts.push(outgoer);
+            } else {
+              traverseTreeDFS(
+                outgoer,
+                (child) => {
+                  const childClosure = closureMap.get(child.id) || new Set();
+                  if (childClosure.has(current.id + "-true")) {
+                    childClosure.delete(current.id + "-true");
+                  } else {
+                    childClosure.add(current.id + "-false");
+                  }
+                  closureMap.set(child.id, childClosure);
+                },
+                nodes,
+                edges
+              );
+              temp += getTryExceptCode("except", currentIndent);
+              falseOuts.push(outgoer);
+            }
+
+            if (codeMap.has(outgoer.id)) {
+              const outgoerCodeList = codeMap.get(outgoer.id) as string[];
+              const newOutgoerCodeList = outgoerCodeList.concat(temp);
+              codeMap.set(outgoer.id, newOutgoerCodeList);
+            } else {
+              codeMap.set(outgoer.id, [temp]);
+            }
+          });
+          ss.push(...falseOuts, ...trueOuts);
+          currentCodeList[lastIndex] += getTryExceptCode("try", currentIndent);
+          currentCodeList[lastIndex] += getBlockCode(current, currentIndent + 1);
         } else {
+          currentCodeList[lastIndex] += getBlockCode(current, currentIndent);
           outgoers.forEach((outgoer) => {
             ss.push(outgoer);
             if (codeMap.has(outgoer.id)) {
@@ -56,11 +117,20 @@ export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean
     }
   });
 
+const traverseTreeDFS = (node: Node, callback: (n: Node) => void, nodes: Node[], edges: Edge[]) => {
+  const ss = [node];
+  while (ss.length > 0) {
+    const current = ss.pop() as Node;
+    callback(current);
+    ss.push(...getOutgoers(current, nodes, edges));
+  }
+};
+
 export const getTryExceptCode = (part: "try" | "except", indent = 1, exceptionType = "ImageNotFoundException") => {
   if (part === "try") {
     return `${" ".repeat(indent * 4)}try:\n`;
   }
-  return `${" ".repeat(indent * 4)}except ${exceptionType}:\n`;
+  return `${" ".repeat(indent * 4)}except ${exceptionType}:\n${" ".repeat((indent + 1) * 4)}pass\n`;
 };
 
 export const getBlockCode = (node: Node, indent = 1) => {
