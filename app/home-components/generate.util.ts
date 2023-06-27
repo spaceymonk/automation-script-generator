@@ -14,6 +14,7 @@ export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean
       reject(new Error("no entry point"));
     }
 
+    const closureMap = new Map<string, string[]>();
     const codeMap = new Map<string, string[]>();
     const leafSet = new Set<string>();
     entryPoints.forEach((entryPoint) => {
@@ -32,16 +33,19 @@ export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean
           leafSet.add(current.id);
         }
 
-        outgoers.forEach((outgoer) => {
-          ss.push(outgoer);
-          if (codeMap.has(outgoer.id)) {
-            const outgoerCodeList = codeMap.get(outgoer.id) as string[];
-            const newOutgoerCodeList = outgoerCodeList.concat(currentCodeList[lastIndex]);
-            codeMap.set(outgoer.id, newOutgoerCodeList);
-          } else {
-            codeMap.set(outgoer.id, currentCodeList.concat());
-          }
-        });
+        if (current.type === "find") {
+        } else {
+          outgoers.forEach((outgoer) => {
+            ss.push(outgoer);
+            if (codeMap.has(outgoer.id)) {
+              const outgoerCodeList = codeMap.get(outgoer.id) as string[];
+              const newOutgoerCodeList = outgoerCodeList.concat(currentCodeList[lastIndex]);
+              codeMap.set(outgoer.id, newOutgoerCodeList);
+            } else {
+              codeMap.set(outgoer.id, currentCodeList.concat());
+            }
+          });
+        }
       }
     });
 
@@ -51,6 +55,13 @@ export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean
       resolve(getCode(codeMap, leafSet));
     }
   });
+
+export const getTryExceptCode = (part: "try" | "except", indent = 1, exceptionType = "ImageNotFoundException") => {
+  if (part === "try") {
+    return `${" ".repeat(indent * 4)}try:\n`;
+  }
+  return `${" ".repeat(indent * 4)}except ${exceptionType}:\n`;
+};
 
 export const getBlockCode = (node: Node, indent = 1) => {
   if (node.type === "start") {
@@ -62,6 +73,10 @@ export const getBlockCode = (node: Node, indent = 1) => {
   if (node.type === "wait") {
     return `${" ".repeat(indent * 4)}time.sleep(${node.data?.text})\n`;
   }
+  if (node.type === "find") {
+    return `${" ".repeat(indent * 4)}x, y = pyautogui.locateCenterOnScreen(${node.data?.text})\n`;
+  }
+
   return `${" ".repeat(indent * 4)}# ${node.type?.toUpperCase()}(${node.data?.text})\n`;
 };
 

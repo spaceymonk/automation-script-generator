@@ -1,5 +1,5 @@
 import { Edge, Node } from "reactflow";
-import { generate, getBlockCode, getEntryPoints } from "../app/home-components/generate.util";
+import { generate, getBlockCode, getEntryPoints, getTryExceptCode } from "../app/home-components/generate.util";
 
 describe("[getEntryPoint]", () => {
   test("should be empty", () => {
@@ -299,9 +299,10 @@ describe("[generate]", () => {
       ];
 
       let expected = "";
-      expected += getBlockCode(nodes[3], 1);
+      expected += getTryExceptCode("try");
+      expected += getBlockCode(nodes[3], 2);
       expected += getBlockCode(nodes[1], 2);
-      expected += "    catch ImageNotFoundException:\n";
+      expected += getTryExceptCode("except");
       expected += getBlockCode(nodes[2], 2);
       expected += "\n";
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
