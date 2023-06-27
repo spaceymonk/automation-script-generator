@@ -128,7 +128,7 @@ describe("[generate]", () => {
   });
 
   describe("forked, no branch, no loop", () => {
-    test("resolves forked from single start block with no merged connection", async () => {
+    test("resolves single start block with no merged connection", async () => {
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -149,7 +149,7 @@ describe("[generate]", () => {
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
-    test("resolves forked from single start block with merged connection", async () => {
+    test("resolves single start block with merged connection", async () => {
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -179,7 +179,7 @@ describe("[generate]", () => {
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
-    test("resolves forked from multiple start block with no merged connection", async () => {
+    test("resolves multiple start block with no merged connection", async () => {
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -211,7 +211,7 @@ describe("[generate]", () => {
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
-    test("resolves forked from multiple start block with merged connection (complex)", async () => {
+    test("resolves multiple start block with merged connection (complex)", async () => {
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -257,7 +257,7 @@ describe("[generate]", () => {
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
 
-    test("resolves forked from multiple start block with merged connection (simple)", async () => {
+    test("resolves multiple start block with merged connection (simple)", async () => {
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "start", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -285,7 +285,7 @@ describe("[generate]", () => {
   });
 
   describe("no fork, branched, no loop", () => {
-    test("resolves branched, one level, separate, left - right children", async () => {
+    test("resolves flatten, separate, one true and one false children", async () => {
       const nodes: Node[] = [
         { id: "n1", type: "start", position: { x: 0, y: 0 }, data: { text: "n1" } },
         { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
@@ -299,11 +299,141 @@ describe("[generate]", () => {
       ];
 
       let expected = "";
-      expected += getTryExceptCode("try");
+      expected += getTryExceptCode("try", 1);
       expected += getBlockCode(nodes[3], 2);
       expected += getBlockCode(nodes[1], 2);
-      expected += getTryExceptCode("except");
+      expected += getTryExceptCode("except", 1);
       expected += getBlockCode(nodes[2], 2);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+
+    test("resolves flatten, separate, two true and two false children", async () => {
+      const nodes: Node[] = [
+        { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+        { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+        { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
+        { id: "n3", type: "click", position: { x: 0, y: 0 }, data: { text: "n3" } },
+        { id: "n4", type: "click", position: { x: 0, y: 0 }, data: { text: "n4" } },
+        { id: "n5", type: "click", position: { x: 0, y: 0 }, data: { text: "n5" } },
+      ];
+      const edges: Edge[] = [
+        { id: "e1", source: "n0", target: "n1" },
+        { id: "e2", source: "n1", target: "n2", sourceHandle: "true" },
+        { id: "e3", source: "n2", target: "n3" },
+        { id: "e4", source: "n1", target: "n4", sourceHandle: "false" },
+        { id: "e5", source: "n4", target: "n5" },
+      ];
+
+      let expected = "";
+      expected += getTryExceptCode("try", 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += getBlockCode(nodes[2], 2);
+      expected += getBlockCode(nodes[3], 2);
+      expected += getTryExceptCode("except", 1);
+      expected += getBlockCode(nodes[4], 2);
+      expected += getBlockCode(nodes[5], 2);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+
+    test("resolves flatten, separate, one true children", async () => {
+      const nodes: Node[] = [
+        { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+        { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+        { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
+      ];
+      const edges: Edge[] = [
+        { id: "e2", source: "n0", target: "n1" },
+        { id: "e1", source: "n1", target: "n2", sourceHandle: "true" },
+      ];
+
+      let expected = "";
+      expected += getTryExceptCode("try", 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += getBlockCode(nodes[2], 2);
+      expected += getTryExceptCode("except", 1);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+
+    test("resolves flatten, separate, two true children", async () => {
+      const nodes: Node[] = [
+        { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+        { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+        { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
+        { id: "n3", type: "click", position: { x: 0, y: 0 }, data: { text: "n3" } },
+      ];
+      const edges: Edge[] = [
+        { id: "e2", source: "n0", target: "n1" },
+        { id: "e1", source: "n1", target: "n2", sourceHandle: "true" },
+        { id: "e3", source: "n2", target: "n3" },
+      ];
+
+      let expected = "";
+      expected += getTryExceptCode("try", 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += getBlockCode(nodes[2], 2);
+      expected += getBlockCode(nodes[3], 2);
+      expected += getTryExceptCode("except", 1);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+
+    test("resolves flatten, separate, one false children", async () => {
+      const nodes: Node[] = [
+        { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+        { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+        { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
+      ];
+      const edges: Edge[] = [
+        { id: "e2", source: "n0", target: "n1" },
+        { id: "e1", source: "n1", target: "n2", sourceHandle: "false" },
+      ];
+
+      let expected = "";
+      expected += getTryExceptCode("try", 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += getTryExceptCode("except", 1);
+      expected += getBlockCode(nodes[2], 2);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+
+    test("resolves flatten, separate, two false children", async () => {
+      const nodes: Node[] = [
+        { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+        { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+        { id: "n2", type: "click", position: { x: 0, y: 0 }, data: { text: "n2" } },
+        { id: "n3", type: "click", position: { x: 0, y: 0 }, data: { text: "n3" } },
+      ];
+      const edges: Edge[] = [
+        { id: "e2", source: "n0", target: "n1" },
+        { id: "e1", source: "n1", target: "n2", sourceHandle: "false" },
+        { id: "e3", source: "n2", target: "n3" },
+      ];
+
+      let expected = "";
+      expected += getTryExceptCode("try", 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += getTryExceptCode("except", 1);
+      expected += getBlockCode(nodes[2], 2);
+      expected += getBlockCode(nodes[3], 2);
+      expected += "\n";
+      await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+    });
+
+    test("resolves flatten, separate, no children", async () => {
+      const nodes: Node[] = [
+        { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+        { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+      ];
+      const edges: Edge[] = [{ id: "e2", source: "n0", target: "n1" }];
+
+      let expected = "";
+      expected += getTryExceptCode("try", 1);
+      expected += getBlockCode(nodes[1], 2);
+      expected += getTryExceptCode("except", 1);
       expected += "\n";
       await expect(generate(nodes, edges, true)).resolves.toBe(expected);
     });
