@@ -165,6 +165,9 @@ const generate_util = (
       const fromTrueHandle = edges.some(
         (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "true"
       );
+      const fromFalseHandle = edges.some(
+        (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "false"
+      );
       if (fromTrueHandle) {
         trueOutgoers.push(outgoer);
         traverseTreeDFS(
@@ -181,7 +184,8 @@ const generate_util = (
           nodes,
           edges
         );
-      } else {
+      }
+      if (fromFalseHandle) {
         falseOutgoers.push(outgoer);
         traverseTreeDFS(
           outgoer,
@@ -202,11 +206,10 @@ const generate_util = (
     trueOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap));
     falseOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap));
 
+    let currentCodeList = [] as string[];
     const trueOutgoerCodeList = trueOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
     const falseOutgoerCodeList = falseOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
     const blockCode = getBlockCode(current, currentIndent + 1);
-    let currentCodeList = [] as string[];
-
     if (trueOutgoerCodeList.length === 0 && falseOutgoerCodeList.length !== 0) {
       currentCodeList = falseOutgoerCodeList.map(
         (code) => getTryExceptCode("try", currentIndent) + blockCode + getTryExceptCode("except", currentIndent) + code
