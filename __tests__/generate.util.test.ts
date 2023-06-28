@@ -593,6 +593,81 @@ describe("[generate]", () => {
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
       });
+
+      test("resolves two find blocks with merged true handle", async () => {
+        const nodes: Node[] = [
+          { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+          { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+          { id: "n2", type: "find", position: { x: 0, y: 0 }, data: { text: "n2" } },
+          { id: "n3", type: "click", position: { x: 0, y: 0 }, data: { text: "n3" } },
+          { id: "n4", type: "click", position: { x: 0, y: 0 }, data: { text: "n4" } },
+          { id: "n5", type: "click", position: { x: 0, y: 0 }, data: { text: "n5" } },
+          { id: "n6", type: "click", position: { x: 0, y: 0 }, data: { text: "n6" } },
+        ];
+        const edges: Edge[] = [
+          { id: "e1", source: "n0", target: "n1" },
+          { id: "e2", source: "n0", target: "n2" },
+          { id: "e3", source: "n1", target: "n3", sourceHandle: "true" },
+          { id: "e4", source: "n2", target: "n3", sourceHandle: "true" },
+          { id: "e5", source: "n1", target: "n4", sourceHandle: "false" },
+          { id: "e6", source: "n2", target: "n5", sourceHandle: "false" },
+          { id: "e7", source: "n4", target: "n6" },
+        ];
+
+        let expected = "";
+        expected += getTryExceptCode("try", 1);
+        expected += getBlockCode(nodes[1], 2);
+        expected += getBlockCode(nodes[3], 2);
+        expected += getTryExceptCode("except", 1);
+        expected += getBlockCode(nodes[4], 2);
+        expected += getBlockCode(nodes[6], 2);
+        expected += "\n";
+        expected += getTryExceptCode("try", 1);
+        expected += getBlockCode(nodes[2], 2);
+        expected += getBlockCode(nodes[3], 2);
+        expected += getTryExceptCode("except", 1);
+        expected += getBlockCode(nodes[5], 2);
+        expected += "\n";
+        await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+      });
+
+      test("resolves two find blocks with merged opposite handles", async () => {
+        const nodes: Node[] = [
+          { id: "n0", type: "start", position: { x: 0, y: 0 }, data: { text: "n0" } },
+          { id: "n1", type: "find", position: { x: 0, y: 0 }, data: { text: "n1" } },
+          { id: "n2", type: "find", position: { x: 0, y: 0 }, data: { text: "n2" } },
+          { id: "n3", type: "click", position: { x: 0, y: 0 }, data: { text: "n3" } },
+          { id: "n4", type: "click", position: { x: 0, y: 0 }, data: { text: "n4" } },
+          { id: "n5", type: "click", position: { x: 0, y: 0 }, data: { text: "n5" } },
+          { id: "n6", type: "click", position: { x: 0, y: 0 }, data: { text: "n6" } },
+        ];
+        const edges: Edge[] = [
+          { id: "e1", source: "n0", target: "n1" },
+          { id: "e2", source: "n0", target: "n2" },
+          { id: "e3", source: "n1", target: "n3", sourceHandle: "true" },
+          { id: "e4", source: "n2", target: "n3", sourceHandle: "false" },
+          { id: "e5", source: "n1", target: "n4", sourceHandle: "false" },
+          { id: "e6", source: "n3", target: "n5" },
+          { id: "e7", source: "n4", target: "n6" },
+        ];
+
+        let expected = "";
+        expected += getTryExceptCode("try", 1);
+        expected += getBlockCode(nodes[1], 2);
+        expected += getBlockCode(nodes[3], 2);
+        expected += getBlockCode(nodes[5], 2);
+        expected += getTryExceptCode("except", 1);
+        expected += getBlockCode(nodes[4], 2);
+        expected += getBlockCode(nodes[6], 2);
+        expected += "\n";
+        expected += getTryExceptCode("try", 1);
+        expected += getBlockCode(nodes[2], 2);
+        expected += getTryExceptCode("except", 1);
+        expected += getBlockCode(nodes[3], 2);
+        expected += getBlockCode(nodes[5], 2);
+        expected += "\n";
+        await expect(generate(nodes, edges, true)).resolves.toBe(expected);
+      });
     });
     describe("✨ nested ✨ merged ✨", () => {
       // TODO: add test cases

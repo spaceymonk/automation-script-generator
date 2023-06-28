@@ -152,11 +152,10 @@ const generate_util = (
   nodes: Node[],
   edges: Edge[],
   codeMap: Map<string, string[]>,
-  closureMap = new Map<string, Set<string>>()
+  closureMap = new Map<string, Set<string>>(),
+  currentIndent = 1
 ) => {
   const outgoers = getOutgoers(current, nodes, edges);
-  let currentIndent = closureMap.get(current.id)?.size;
-  currentIndent = (currentIndent === undefined ? 1 : currentIndent + 1) as number;
 
   if (current.type === "find") {
     const trueOutgoers = [] as Node[];
@@ -203,8 +202,8 @@ const generate_util = (
         );
       }
     });
-    trueOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap));
-    falseOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap));
+    trueOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent + 1));
+    falseOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent + 1));
 
     let currentCodeList = [] as string[];
     const trueOutgoerCodeList = trueOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
@@ -237,7 +236,7 @@ const generate_util = (
 
     codeMap.set(current.id, currentCodeList);
   } else {
-    outgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap));
+    outgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent));
     const outgoerCodeList = outgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
     const blockCode = getBlockCode(current, currentIndent);
     let currentCodeList = outgoerCodeList.map((code) => blockCode + code);
