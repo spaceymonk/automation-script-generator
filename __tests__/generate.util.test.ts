@@ -454,6 +454,7 @@ describe("[generate]", () => {
           { id: "n4", type: "click", position: { x: 0, y: 0 }, data: { text: "n4" } },
           { id: "n5", type: "click", position: { x: 0, y: 0 }, data: { text: "n5" } },
           { id: "n6", type: "click", position: { x: 0, y: 0 }, data: { text: "n6" } },
+          { id: "n7", type: "click", position: { x: 0, y: 0 }, data: { text: "n7" } },
         ];
         const edges: Edge[] = [
           { id: "e1", source: "n0", target: "n1" },
@@ -463,6 +464,7 @@ describe("[generate]", () => {
           { id: "e5", source: "n4", target: "n5" },
           { id: "e6", source: "n5", target: "n6" },
           { id: "e7", source: "n3", target: "n6" },
+          { id: "e8", source: "n6", target: "n7" },
         ];
 
         let expected = "";
@@ -474,6 +476,7 @@ describe("[generate]", () => {
         expected += getBlockCode(nodes[4], 2);
         expected += getBlockCode(nodes[5], 2);
         expected += getBlockCode(nodes[6], 1);
+        expected += getBlockCode(nodes[7], 1);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
       });
