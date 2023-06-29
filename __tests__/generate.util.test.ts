@@ -1,5 +1,5 @@
 import { Edge, Node } from "reactflow";
-import { generate, getBlockCode, getEntryPoints, getTryExceptCode } from "../app/home-components/generate.util";
+import { generate, getBlockCode, getEntryPoints, getTryExceptPassCode } from "../app/home-components/generate.util";
 
 describe("[getEntryPoint]", () => {
   test("should be empty", () => {
@@ -305,10 +305,10 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[3], 2);
         expected += getBlockCode(nodes[1], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[2], 2);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
@@ -332,11 +332,11 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[4], 2);
         expected += getBlockCode(nodes[5], 2);
         expected += "\n";
@@ -355,10 +355,11 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[2], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
+        expected += getTryExceptPassCode("pass", 2);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
       });
@@ -377,11 +378,12 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
+        expected += getTryExceptPassCode("pass", 2);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
       });
@@ -398,9 +400,9 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[2], 2);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
@@ -420,9 +422,9 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
         expected += "\n";
@@ -437,9 +439,10 @@ describe("[generate]", () => {
         const edges: Edge[] = [{ id: "e2", source: "n0", target: "n1" }];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
+        expected += getTryExceptPassCode("pass", 2);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
       });
@@ -468,11 +471,11 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[4], 2);
         expected += getBlockCode(nodes[5], 2);
         expected += getBlockCode(nodes[6], 1);
@@ -498,11 +501,12 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
+        expected += getTryExceptPassCode("pass", 2);
         expected += getBlockCode(nodes[4], 1);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
@@ -525,9 +529,9 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
         expected += getBlockCode(nodes[4], 1);
@@ -550,9 +554,10 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
+        expected += getTryExceptPassCode("pass", 2);
         expected += getBlockCode(nodes[2], 1);
         expected += getBlockCode(nodes[3], 1);
         expected += "\n";
@@ -580,17 +585,17 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[4], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[3], 2);
         expected += getBlockCode(nodes[6], 2);
         expected += "\n";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[5], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[3], 2);
         expected += getBlockCode(nodes[6], 2);
         expected += "\n";
@@ -618,17 +623,17 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[3], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[4], 2);
         expected += getBlockCode(nodes[6], 2);
         expected += "\n";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[2], 2);
         expected += getBlockCode(nodes[3], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[5], 2);
         expected += "\n";
         await expect(generate(nodes, edges, true)).resolves.toBe(expected);
@@ -655,17 +660,17 @@ describe("[generate]", () => {
         ];
 
         let expected = "";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[1], 2);
         expected += getBlockCode(nodes[3], 2);
         expected += getBlockCode(nodes[5], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[4], 2);
         expected += getBlockCode(nodes[6], 2);
         expected += "\n";
-        expected += getTryExceptCode("try", 1);
+        expected += getTryExceptPassCode("try", 1);
         expected += getBlockCode(nodes[2], 2);
-        expected += getTryExceptCode("except", 1);
+        expected += getTryExceptPassCode("except", 1);
         expected += getBlockCode(nodes[3], 2);
         expected += getBlockCode(nodes[5], 2);
         expected += "\n";

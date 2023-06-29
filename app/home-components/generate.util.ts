@@ -1,5 +1,5 @@
-import { Edge, Node, getOutgoers } from "reactflow";
 import cloneDeep from "lodash.clonedeep";
+import { Edge, Node, getOutgoers } from "reactflow";
 
 export const getEntryPoints = (nodes: Node[], edges: Edge[]) =>
   Object.values(
@@ -7,116 +7,6 @@ export const getEntryPoints = (nodes: Node[], edges: Edge[]) =>
       .filter((n) => n.type === "start" && getOutgoers(n, nodes, edges).length !== 0)
       .reduce((acc, n) => ({ ...acc, [n.id]: n }), {}) as Node[]
   );
-
-const generate_top2bottom = async (nodes: Node[], edges: Edge[], debugging?: boolean): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const entryPoints = getEntryPoints(nodes, edges);
-    if (entryPoints.length === 0) {
-      reject(new Error("no entry point"));
-    }
-
-    const closureMap = new Map<string, Set<string>>();
-    const codeMap = new Map<string, string[]>();
-    const leafSet = new Set<string>();
-    entryPoints.forEach((entryPoint) => {
-      const ss = [entryPoint];
-      let current: Node;
-
-      while (ss.length > 0) {
-        current = ss.pop() as Node;
-
-        const currentCodeList = codeMap.get(current.id) || [""];
-        const lastIndex = currentCodeList.length - 1;
-
-        const outgoers = getOutgoers(current, nodes, edges);
-        if (outgoers.length === 0) {
-          leafSet.add(current.id);
-        }
-
-        let currentIndent = 1;
-        if (closureMap.has(current.id)) {
-          currentIndent = (closureMap.get(current.id) as Set<string>).size + 1;
-        }
-
-        if (current.type === "find") {
-          const trueOuts = [] as Node[];
-          const falseOuts = [] as Node[];
-          outgoers.forEach((outgoer) => {
-            const fromTrueHandle = edges.some(
-              (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "true"
-            );
-            let temp = currentCodeList[lastIndex].concat();
-
-            if (fromTrueHandle) {
-              traverseTreeDFS(
-                outgoer,
-                (child) => {
-                  const childClosure = closureMap.get(child.id) || new Set();
-                  if (childClosure.has(current.id + "-false")) {
-                    childClosure.delete(current.id + "-false");
-                  } else {
-                    childClosure.add(current.id + "-true");
-                  }
-                  closureMap.set(child.id, childClosure);
-                },
-                nodes,
-                edges
-              );
-              temp += getTryExceptCode("try", currentIndent);
-              temp += getBlockCode(current, currentIndent + 1);
-              trueOuts.push(outgoer);
-            } else {
-              traverseTreeDFS(
-                outgoer,
-                (child) => {
-                  const childClosure = closureMap.get(child.id) || new Set();
-                  if (childClosure.has(current.id + "-true")) {
-                    childClosure.delete(current.id + "-true");
-                  } else {
-                    childClosure.add(current.id + "-false");
-                  }
-                  closureMap.set(child.id, childClosure);
-                },
-                nodes,
-                edges
-              );
-              temp += getTryExceptCode("except", currentIndent);
-              falseOuts.push(outgoer);
-            }
-
-            if (codeMap.has(outgoer.id)) {
-              const outgoerCodeList = codeMap.get(outgoer.id) as string[];
-              const newOutgoerCodeList = outgoerCodeList.concat(temp);
-              codeMap.set(outgoer.id, newOutgoerCodeList);
-            } else {
-              codeMap.set(outgoer.id, [temp]);
-            }
-          });
-          ss.push(...falseOuts, ...trueOuts);
-          currentCodeList[lastIndex] += getTryExceptCode("try", currentIndent);
-          currentCodeList[lastIndex] += getBlockCode(current, currentIndent + 1);
-        } else {
-          currentCodeList[lastIndex] += getBlockCode(current, currentIndent);
-          outgoers.forEach((outgoer) => {
-            ss.push(outgoer);
-            if (codeMap.has(outgoer.id)) {
-              const outgoerCodeList = codeMap.get(outgoer.id) as string[];
-              const newOutgoerCodeList = outgoerCodeList.concat(currentCodeList[lastIndex]);
-              codeMap.set(outgoer.id, newOutgoerCodeList);
-            } else {
-              codeMap.set(outgoer.id, currentCodeList.concat());
-            }
-          });
-        }
-      }
-    });
-
-    if (debugging) {
-      resolve(getDebugCode(codeMap, leafSet));
-    } else {
-      resolve(getCode(codeMap, leafSet));
-    }
-  });
 
 const traverseTreeDFS = (node: Node, callback: (n: Node) => void, nodes: Node[], edges: Edge[]) => {
   const ss = [node];
@@ -127,7 +17,7 @@ const traverseTreeDFS = (node: Node, callback: (n: Node) => void, nodes: Node[],
   }
 };
 
-const generate_bottom2top = async (nodes: Node[], edges: Edge[], debugging?: boolean): Promise<string> =>
+export const generate = async (nodes: Node[], edges: Edge[], debugging?: boolean): Promise<string> =>
   new Promise((resolve, reject) => {
     const entryPoints = getEntryPoints(nodes, edges);
     if (entryPoints.length === 0) {
@@ -148,6 +38,30 @@ const generate_bottom2top = async (nodes: Node[], edges: Edge[], debugging?: boo
     }
   });
 
+const markerGenerator =
+  (suffix1: string, suffix2: string, current: Node, closureMap: Map<string, Set<string>>) =>
+  (child: Node): void => {
+    const childClosure = closureMap.get(child.id) || new Set();
+    if (childClosure.has(current.id + suffix1)) {
+      childClosure.delete(current.id + suffix1);
+    } else {
+      childClosure.add(current.id + suffix2);
+    }
+    closureMap.set(child.id, childClosure);
+  };
+
+const separatorGenerator =
+  (suffix: string, excludedItemList: Node[], current: Node, closureMap: Map<string, Set<string>>) =>
+  (node: Node): boolean => {
+    if (closureMap.get(node.id)?.has(current.id + suffix)) {
+      return true;
+    }
+    if (!excludedItemList.includes(node)) {
+      excludedItemList.push(node);
+    }
+    return false;
+  };
+
 const generate_util = (
   current: Node,
   nodes: Node[],
@@ -160,115 +74,7 @@ const generate_util = (
   const outgoers = getOutgoers(current, nodes, edges);
 
   if (current.type === "find") {
-    let trueOutgoers = [] as Node[];
-    let falseOutgoers = [] as Node[];
-    let remainingOutgoers = [] as Node[];
-    outgoers.forEach((outgoer) => {
-      const fromTrueHandle = edges.some(
-        (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "true"
-      );
-      const fromFalseHandle = edges.some(
-        (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "false"
-      );
-      if (fromTrueHandle) {
-        trueOutgoers.push(outgoer);
-        traverseTreeDFS(
-          outgoer,
-          (child) => {
-            const childClosure = closureMap.get(child.id) || new Set();
-            if (childClosure.has(current.id + "-false")) {
-              childClosure.delete(current.id + "-false");
-            } else {
-              childClosure.add(current.id + "-true");
-            }
-            closureMap.set(child.id, childClosure);
-          },
-          nodes,
-          edges
-        );
-      }
-      if (fromFalseHandle) {
-        falseOutgoers.push(outgoer);
-        traverseTreeDFS(
-          outgoer,
-          (child) => {
-            const childClosure = closureMap.get(child.id) || new Set();
-            if (childClosure.has(current.id + "-true")) {
-              childClosure.delete(current.id + "-true");
-            } else {
-              childClosure.add(current.id + "-false");
-            }
-            closureMap.set(child.id, childClosure);
-          },
-          nodes,
-          edges
-        );
-      }
-    });
-
-    const filterGenerator =
-      (suffix: string) =>
-      (outgoer: Node): boolean => {
-        if (closureMap.get(outgoer.id)?.has(current.id + suffix)) {
-          return true;
-        }
-        if (!remainingOutgoers.includes(outgoer)) {
-          remainingOutgoers.push(outgoer);
-        }
-        return false;
-      };
-    const trueChildrenFilter = filterGenerator("-true");
-    const falseChildrenFilter = filterGenerator("-false");
-
-    trueOutgoers = trueOutgoers.filter(trueChildrenFilter);
-    falseOutgoers = falseOutgoers.filter(falseChildrenFilter);
-
-    const clonedCodeMap = cloneDeep(codeMap);
-    trueOutgoers.forEach((outgoer) =>
-      generate_util(outgoer, nodes, edges, clonedCodeMap, closureMap, currentIndent + 1, trueChildrenFilter)
-    );
-    falseOutgoers.forEach((outgoer) =>
-      generate_util(outgoer, nodes, edges, clonedCodeMap, closureMap, currentIndent + 1, falseChildrenFilter)
-    );
-    remainingOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent));
-
-    let currentCodeList = [] as string[];
-    const trueOutgoerCodeList = trueOutgoers.flatMap((outgoer) => clonedCodeMap.get(outgoer.id));
-    const falseOutgoerCodeList = falseOutgoers.flatMap((outgoer) => clonedCodeMap.get(outgoer.id));
-    const remainingOutgoerCodeList = remainingOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
-    const blockCode = getBlockCode(current, currentIndent + 1);
-    if (trueOutgoerCodeList.length === 0 && falseOutgoerCodeList.length !== 0) {
-      currentCodeList = falseOutgoerCodeList.map(
-        (code) => getTryExceptCode("try", currentIndent) + blockCode + getTryExceptCode("except", currentIndent) + code
-      );
-    } else if (trueOutgoerCodeList.length !== 0 && falseOutgoerCodeList.length === 0) {
-      currentCodeList = trueOutgoerCodeList.map(
-        (code) => getTryExceptCode("try", currentIndent) + blockCode + code + getTryExceptCode("except", currentIndent)
-      );
-    } else if (trueOutgoerCodeList.length === 0 && falseOutgoerCodeList.length === 0) {
-      currentCodeList = [
-        getTryExceptCode("try", currentIndent) + blockCode + getTryExceptCode("except", currentIndent),
-      ];
-    } else {
-      currentCodeList = trueOutgoerCodeList.flatMap((trueCode) =>
-        falseOutgoerCodeList.map(
-          (falseCode) =>
-            getTryExceptCode("try", currentIndent) +
-            blockCode +
-            trueCode +
-            getTryExceptCode("except", currentIndent) +
-            falseCode
-        )
-      );
-    }
-
-    remainingOutgoerCodeList.forEach((remainingCode) => {
-      currentCodeList.forEach((_, index) => {
-        currentCodeList[index] += remainingCode;
-      });
-    });
-
-    codeMap.set(current.id, currentCodeList);
+    generate_util_branch(outgoers, edges, current, closureMap, nodes, codeMap, currentIndent);
   } else {
     outgoers
       .filter(predicate)
@@ -283,11 +89,18 @@ const generate_util = (
   }
 };
 
-export const getTryExceptCode = (part: "try" | "except", indent = 1, exceptionType = "ImageNotFoundException") => {
+export const getTryExceptPassCode = (
+  part: "try" | "except" | "pass",
+  indent = 1,
+  exceptionType = "ImageNotFoundException"
+) => {
   if (part === "try") {
     return `${" ".repeat(indent * 4)}try:\n`;
   }
-  return `${" ".repeat(indent * 4)}except ${exceptionType}:\n${" ".repeat((indent + 1) * 4)}pass\n`;
+  if (part === "pass") {
+    return `${" ".repeat(indent * 4)}pass\n`;
+  }
+  return `${" ".repeat(indent * 4)}except ${exceptionType}:\n`;
 };
 
 export const getBlockCode = (node: Node, indent = 1) => {
@@ -332,6 +145,101 @@ const getCode = (codeMap: Map<string, string[]>, leafSet: Set<string>) => {
   return codeText;
 };
 
+const generate_util_branch = (
+  outgoers: Node<any, string | undefined>[],
+  edges: Edge[],
+  current: Node,
+  closureMap: Map<string, Set<string>>,
+  nodes: Node[],
+  codeMap: Map<string, string[]>,
+  currentIndent: number
+) => {
+  let trueOutgoers = [] as Node[];
+  let falseOutgoers = [] as Node[];
+  let remainingOutgoers = [] as Node[];
+  outgoers.forEach((outgoer) => {
+    const fromTrueHandle = edges.some(
+      (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "true"
+    );
+    const fromFalseHandle = edges.some(
+      (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "false"
+    );
+    if (fromTrueHandle) {
+      trueOutgoers.push(outgoer);
+      traverseTreeDFS(outgoer, markerGenerator("-false", "-true", current, closureMap), nodes, edges);
+    }
+    if (fromFalseHandle) {
+      falseOutgoers.push(outgoer);
+      traverseTreeDFS(outgoer, markerGenerator("-true", "-false", current, closureMap), nodes, edges);
+    }
+  });
+
+  const trueChildrenFilter = separatorGenerator("-true", remainingOutgoers, current, closureMap);
+  const falseChildrenFilter = separatorGenerator("-false", remainingOutgoers, current, closureMap);
+
+  trueOutgoers = trueOutgoers.filter(trueChildrenFilter);
+  falseOutgoers = falseOutgoers.filter(falseChildrenFilter);
+
+  const clonedCodeMap = cloneDeep(codeMap);
+  trueOutgoers.forEach((outgoer) =>
+    generate_util(outgoer, nodes, edges, clonedCodeMap, closureMap, currentIndent + 1, trueChildrenFilter)
+  );
+  falseOutgoers.forEach((outgoer) =>
+    generate_util(outgoer, nodes, edges, clonedCodeMap, closureMap, currentIndent + 1, falseChildrenFilter)
+  );
+  remainingOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent));
+
+  let currentCodeList = [] as string[];
+  const trueOutgoerCodeList = trueOutgoers.flatMap((outgoer) => clonedCodeMap.get(outgoer.id));
+  const falseOutgoerCodeList = falseOutgoers.flatMap((outgoer) => clonedCodeMap.get(outgoer.id));
+  const remainingOutgoerCodeList = remainingOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
+  const blockCode = getBlockCode(current, currentIndent + 1);
+  if (trueOutgoerCodeList.length === 0 && falseOutgoerCodeList.length !== 0) {
+    currentCodeList = falseOutgoerCodeList.map(
+      (falseCode) =>
+        getTryExceptPassCode("try", currentIndent) +
+        blockCode +
+        getTryExceptPassCode("except", currentIndent) +
+        falseCode
+    );
+  } else if (trueOutgoerCodeList.length !== 0 && falseOutgoerCodeList.length === 0) {
+    currentCodeList = trueOutgoerCodeList.map(
+      (trueCode) =>
+        getTryExceptPassCode("try", currentIndent) +
+        blockCode +
+        trueCode +
+        getTryExceptPassCode("except", currentIndent) +
+        getTryExceptPassCode("pass", currentIndent + 1)
+    );
+  } else if (trueOutgoerCodeList.length === 0 && falseOutgoerCodeList.length === 0) {
+    currentCodeList = [
+      getTryExceptPassCode("try", currentIndent) +
+        blockCode +
+        getTryExceptPassCode("except", currentIndent) +
+        getTryExceptPassCode("pass", currentIndent + 1),
+    ];
+  } else {
+    currentCodeList = trueOutgoerCodeList.flatMap((trueCode) =>
+      falseOutgoerCodeList.map(
+        (falseCode) =>
+          getTryExceptPassCode("try", currentIndent) +
+          blockCode +
+          trueCode +
+          getTryExceptPassCode("except", currentIndent) +
+          falseCode
+      )
+    );
+  }
+
+  remainingOutgoerCodeList.forEach((remainingCode) => {
+    currentCodeList.forEach((_, index) => {
+      currentCodeList[index] += remainingCode;
+    });
+  });
+
+  codeMap.set(current.id, currentCodeList);
+};
+
 function getDebugCode(codeMap: Map<string, string[]>, leafSet: Set<string>) {
   let codeText = "";
   codeMap.forEach((codeList, id) => {
@@ -341,9 +249,3 @@ function getDebugCode(codeMap: Map<string, string[]>, leafSet: Set<string>) {
   });
   return codeText;
 }
-
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export const generate = generate_bottom2top;

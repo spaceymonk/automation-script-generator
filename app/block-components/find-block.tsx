@@ -38,7 +38,6 @@ export default function FindBlock({
         }`}
         type="target"
         position={Position.Left}
-        id="a"
         isConnectable={isConnectable}
       />
       <div

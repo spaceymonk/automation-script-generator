@@ -37,7 +37,6 @@ export default function WaitBlock({
         }`}
         type="target"
         position={Position.Left}
-        id="a"
         isConnectable={isConnectable}
       />
       <div
@@ -85,7 +84,6 @@ export default function WaitBlock({
         }`}
         type="source"
         position={Position.Right}
-        id="b"
         isConnectable={isConnectable}
       />
     </>
