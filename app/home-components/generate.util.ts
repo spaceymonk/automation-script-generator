@@ -1,4 +1,5 @@
 import { Edge, Node, getOutgoers } from "reactflow";
+import cloneDeep from "lodash.clonedeep";
 
 export const getEntryPoints = (nodes: Node[], edges: Edge[]) =>
   Object.values(
@@ -153,13 +154,15 @@ const generate_util = (
   edges: Edge[],
   codeMap: Map<string, string[]>,
   closureMap = new Map<string, Set<string>>(),
-  currentIndent = 1
+  currentIndent = 1,
+  predicate: (node: Node) => boolean = () => true
 ) => {
   const outgoers = getOutgoers(current, nodes, edges);
 
   if (current.type === "find") {
-    const trueOutgoers = [] as Node[];
-    const falseOutgoers = [] as Node[];
+    let trueOutgoers = [] as Node[];
+    let falseOutgoers = [] as Node[];
+    let remainingOutgoers = [] as Node[];
     outgoers.forEach((outgoer) => {
       const fromTrueHandle = edges.some(
         (e) => e.source === current.id && e.target === outgoer.id && e.sourceHandle === "true"
@@ -202,12 +205,37 @@ const generate_util = (
         );
       }
     });
-    trueOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent + 1));
-    falseOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent + 1));
+
+    const filterGenerator =
+      (suffix: string) =>
+      (outgoer: Node): boolean => {
+        if (closureMap.get(outgoer.id)?.has(current.id + suffix)) {
+          return true;
+        }
+        if (!remainingOutgoers.includes(outgoer)) {
+          remainingOutgoers.push(outgoer);
+        }
+        return false;
+      };
+    const trueChildrenFilter = filterGenerator("-true");
+    const falseChildrenFilter = filterGenerator("-false");
+
+    trueOutgoers = trueOutgoers.filter(trueChildrenFilter);
+    falseOutgoers = falseOutgoers.filter(falseChildrenFilter);
+
+    const clonedCodeMap = cloneDeep(codeMap);
+    trueOutgoers.forEach((outgoer) =>
+      generate_util(outgoer, nodes, edges, clonedCodeMap, closureMap, currentIndent + 1, trueChildrenFilter)
+    );
+    falseOutgoers.forEach((outgoer) =>
+      generate_util(outgoer, nodes, edges, clonedCodeMap, closureMap, currentIndent + 1, falseChildrenFilter)
+    );
+    remainingOutgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent));
 
     let currentCodeList = [] as string[];
-    const trueOutgoerCodeList = trueOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
-    const falseOutgoerCodeList = falseOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
+    const trueOutgoerCodeList = trueOutgoers.flatMap((outgoer) => clonedCodeMap.get(outgoer.id));
+    const falseOutgoerCodeList = falseOutgoers.flatMap((outgoer) => clonedCodeMap.get(outgoer.id));
+    const remainingOutgoerCodeList = remainingOutgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
     const blockCode = getBlockCode(current, currentIndent + 1);
     if (trueOutgoerCodeList.length === 0 && falseOutgoerCodeList.length !== 0) {
       currentCodeList = falseOutgoerCodeList.map(
@@ -234,10 +262,18 @@ const generate_util = (
       );
     }
 
+    remainingOutgoerCodeList.forEach((remainingCode) => {
+      currentCodeList.forEach((_, index) => {
+        currentCodeList[index] += remainingCode;
+      });
+    });
+
     codeMap.set(current.id, currentCodeList);
   } else {
-    outgoers.forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent));
-    const outgoerCodeList = outgoers.flatMap((outgoer) => codeMap.get(outgoer.id));
+    outgoers
+      .filter(predicate)
+      .forEach((outgoer) => generate_util(outgoer, nodes, edges, codeMap, closureMap, currentIndent, predicate));
+    const outgoerCodeList = outgoers.flatMap((outgoer) => codeMap.get(outgoer.id) || [""]);
     const blockCode = getBlockCode(current, currentIndent);
     let currentCodeList = outgoerCodeList.map((code) => blockCode + code);
     if (currentCodeList.length === 0) {
