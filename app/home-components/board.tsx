@@ -5,6 +5,7 @@ import ReactFlow, {
   BackgroundVariant,
   Connection,
   ConnectionLineType,
+  DeleteElementsOptions,
   Edge,
   ReactFlowInstance,
   addEdge,
@@ -25,9 +26,11 @@ import {
   red600Color,
   snapGrid,
 } from "../constants";
-import ContextMenu from "./context-menu";
+import ElementContextMenu from "./element-context-menu";
+import PaneContextMenu from "./pane-context-menu";
 
-const MENU_ID = "context-menu-id";
+const PANE_CONTEXT_MENU_ID = "pane-context-menu-id";
+const ELEMENT_CONTEXT_MENU_ID = "node-context-menu-id";
 let __id__ = 1;
 const getId = () => __id__++;
 
@@ -35,8 +38,8 @@ export default function Board() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] =
-    useState<ReactFlowInstance | null>(null);
+  const elementsToRemove = useRef<DeleteElementsOptions>({});
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -55,28 +58,18 @@ export default function Board() {
     [setEdges]
   );
   const onEdgeUpdate = useCallback(
-    (oldEdge: Edge, newConnection: Connection) =>
-      setEdges((els) => updateEdge(oldEdge, newConnection, els)),
+    (oldEdge: Edge, newConnection: Connection) => setEdges((els) => updateEdge(oldEdge, newConnection, els)),
     [setEdges]
   );
-  const handleItemClick = useCallback(
-    ({ event, props, triggerEvent, data: type }: ItemParams) => {
+  const handlePaneContextItemClick = useCallback(
+    ({ triggerEvent, data: type }: ItemParams) => {
       contextMenu.hideAll();
-      if (reactFlowWrapperRef.current === null)
-        throw new Error("onDragOver: reactFlowWrapperRef.current is null");
-      const reactFlowBounds =
-        reactFlowWrapperRef.current.getBoundingClientRect();
-      if (reactFlowInstance === null)
-        throw new Error("onDrop: reactFlowInstance is null");
+      if (reactFlowWrapperRef.current === null) throw new Error("onDragOver: reactFlowWrapperRef.current is null");
+      const reactFlowBounds = reactFlowWrapperRef.current.getBoundingClientRect();
+      if (reactFlowInstance === null) throw new Error("onDrop: reactFlowInstance is null");
       const position = reactFlowInstance.project({
-        x:
-          triggerEvent.clientX -
-          (reactFlowBounds.left +
-            (nodeWidth * reactFlowInstance.getZoom()) / 2),
-        y:
-          triggerEvent.clientY -
-          (reactFlowBounds.top +
-            (nodeHeight * reactFlowInstance.getZoom()) / 2),
+        x: triggerEvent.clientX - (reactFlowBounds.left + (nodeWidth * reactFlowInstance.getZoom()) / 2),
+        y: triggerEvent.clientY - (reactFlowBounds.top + (nodeHeight * reactFlowInstance.getZoom()) / 2),
       });
       const newNode = {
         id: `block-${getId()}`,
@@ -88,12 +81,11 @@ export default function Board() {
     },
     [reactFlowInstance, setNodes]
   );
-  const displayMenu = useCallback((e: React.MouseEvent) => {
-    contextMenu.show({
-      id: MENU_ID,
-      event: e,
-    });
-  }, []);
+  const handleElementContextItemClick = useCallback(() => {
+    contextMenu.hideAll();
+    if (reactFlowInstance === null) throw new Error("onDrop: reactFlowInstance is null");
+    reactFlowInstance.deleteElements(elementsToRemove.current);
+  }, [reactFlowInstance]);
   const onPaneClick = useCallback(
     (event: React.MouseEvent) => {
       if (event.detail === 2) {
@@ -106,11 +98,9 @@ export default function Board() {
 
   return (
     <div className="h-full w-full px-6">
-      <ContextMenu onItemClick={handleItemClick} id={MENU_ID} />
-      <div
-        ref={reactFlowWrapperRef}
-        className="bg-board w-full h-full rounded-xl"
-      >
+      <PaneContextMenu onItemClick={handlePaneContextItemClick} id={PANE_CONTEXT_MENU_ID} />
+      <ElementContextMenu onItemClick={handleElementContextItemClick} id={ELEMENT_CONTEXT_MENU_ID} />
+      <div ref={reactFlowWrapperRef} className="bg-board w-full h-full rounded-xl">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -127,16 +117,26 @@ export default function Board() {
           onEdgeUpdate={onEdgeUpdate}
           selectNodesOnDrag={false}
           onPaneClick={onPaneClick}
-          onPaneContextMenu={displayMenu}
-          // TODO: add onNodeContextMenu to remove block
+          onNodeDrag={() => contextMenu.hideAll()}
+          onSelectionDragStart={() => contextMenu.hideAll()}
+          onDragStartCapture={() => contextMenu.hideAll()}
+          onPaneContextMenu={(e) => contextMenu.show({ id: PANE_CONTEXT_MENU_ID, event: e })}
+          onNodeContextMenu={(event, node) => {
+            elementsToRemove.current = { nodes: [node] };
+            contextMenu.show({ id: ELEMENT_CONTEXT_MENU_ID, event: event });
+          }}
+          onSelectionContextMenu={(event, nodes) => {
+            elementsToRemove.current = { nodes };
+            contextMenu.show({ id: ELEMENT_CONTEXT_MENU_ID, event: event });
+          }}
+          onEdgeContextMenu={(event, edge) => {
+            elementsToRemove.current = { edges: [edge] };
+            contextMenu.show({ id: ELEMENT_CONTEXT_MENU_ID, event: event });
+          }}
           zoomOnDoubleClick={false}
           fitView
         >
-          <Background
-            color={infoColor}
-            gap={snapGrid}
-            variant={BackgroundVariant.Dots}
-          />
+          <Background color={infoColor} gap={snapGrid} variant={BackgroundVariant.Dots} />
         </ReactFlow>
       </div>
     </div>

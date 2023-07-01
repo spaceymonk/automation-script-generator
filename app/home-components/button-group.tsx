@@ -1,4 +1,7 @@
+import "react-toastify/dist/ReactToastify.css";
+
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import { useReactFlow } from "reactflow";
 import { AboutModal } from "./about-modal";
 import { GenerateModal } from "./generate-modal";
@@ -26,12 +29,18 @@ export default function ButtonGroup() {
   const openGenerateModal = () => {
     setGenerateModalState((prev) => ({ ...prev, show: false, request: true }));
     generate(getNodes(), getEdges())
-      .then((text) =>
-        setGenerateModalState((prev) => ({ ...prev, text, show: true }))
-      )
-      .catch((reason) => {
-        console.error(reason);
-        // TODO: better handle generation fails
+      .then((text) => setGenerateModalState((prev) => ({ ...prev, text, show: true })))
+      .catch((reason: Error) => {
+        toast.error(reason.message, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         closeGenerateModal();
       });
   };
@@ -44,6 +53,8 @@ export default function ButtonGroup() {
 
   return (
     <>
+      <ToastContainer />
+
       <div className="my-4 mx-6 select-none flex items-center justify-start">
         <button
           disabled={generateModalState.request}
@@ -59,14 +70,7 @@ export default function ButtonGroup() {
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path
                 className="opacity-75"
                 fill="currentColor"
@@ -87,11 +91,7 @@ export default function ButtonGroup() {
         </button>
       </div>
       <AboutModal show={showAboutModal} onClose={closeAboutModal} />
-      <GenerateModal
-        show={generateModalState.show}
-        onClose={closeGenerateModal}
-        text={generateModalState.text}
-      />
+      <GenerateModal show={generateModalState.show} onClose={closeGenerateModal} text={generateModalState.text} />
     </>
   );
 }

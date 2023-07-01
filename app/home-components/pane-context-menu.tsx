@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Item, ItemParams, Menu } from "react-contexify";
 
-export default function ContextMenu({
+export default function PaneContextMenu({
   onItemClick,
   id,
 }: {
