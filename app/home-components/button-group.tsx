@@ -1,5 +1,3 @@
-import "react-toastify/dist/ReactToastify.css";
-
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useReactFlow } from "reactflow";
@@ -31,16 +29,7 @@ export default function ButtonGroup() {
     generate(getNodes(), getEdges())
       .then((text) => setGenerateModalState((prev) => ({ ...prev, text, show: true })))
       .catch((reason: Error) => {
-        toast.error(reason.message, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        toast.error(reason.message);
         closeGenerateModal();
       });
   };
@@ -53,7 +42,7 @@ export default function ButtonGroup() {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={2000} closeOnClick pauseOnHover draggable theme="colored" />
 
       <div className="my-4 mx-6 select-none flex items-center justify-start">
         <button

@@ -1,6 +1,7 @@
 "use client";
 
 import "react-contexify/dist/ReactContexify.css";
+import "react-toastify/dist/ReactToastify.min.css";
 import "reactflow/dist/style.css";
 
 import Modal from "react-modal";

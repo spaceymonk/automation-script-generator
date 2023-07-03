@@ -64,9 +64,10 @@ export default function Board() {
   const handlePaneContextItemClick = useCallback(
     ({ triggerEvent, data: type }: ItemParams) => {
       contextMenu.hideAll();
-      if (reactFlowWrapperRef.current === null) throw new Error("onDragOver: reactFlowWrapperRef.current is null");
+      if (reactFlowWrapperRef.current === null)
+        throw new Error("handlePaneContextItemClick: reactFlowWrapperRef.current is null");
       const reactFlowBounds = reactFlowWrapperRef.current.getBoundingClientRect();
-      if (reactFlowInstance === null) throw new Error("onDrop: reactFlowInstance is null");
+      if (reactFlowInstance === null) throw new Error("handlePaneContextItemClick: reactFlowInstance is null");
       const position = reactFlowInstance.project({
         x: triggerEvent.clientX - (reactFlowBounds.left + (nodeWidth * reactFlowInstance.getZoom()) / 2),
         y: triggerEvent.clientY - (reactFlowBounds.top + (nodeHeight * reactFlowInstance.getZoom()) / 2),
@@ -83,7 +84,7 @@ export default function Board() {
   );
   const handleElementContextItemClick = useCallback(() => {
     contextMenu.hideAll();
-    if (reactFlowInstance === null) throw new Error("onDrop: reactFlowInstance is null");
+    if (reactFlowInstance === null) throw new Error("handleElementContextItemClick: reactFlowInstance is null");
     reactFlowInstance.deleteElements(elementsToRemove.current);
   }, [reactFlowInstance]);
   const onPaneClick = useCallback(
@@ -134,7 +135,6 @@ export default function Board() {
             contextMenu.show({ id: ELEMENT_CONTEXT_MENU_ID, event: event });
           }}
           zoomOnDoubleClick={false}
-          fitView
         >
           <Background color={infoColor} gap={snapGrid} variant={BackgroundVariant.Dots} />
         </ReactFlow>
