@@ -1,19 +1,11 @@
 import Image from "next/image";
 import { useCallback, useMemo } from "react";
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  useReactFlow,
-} from "reactflow";
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, useReactFlow } from "reactflow";
 import { nodeHeight, nodeWidth } from "../constants";
 
 export default function CustomEdge(props: EdgeProps) {
   const { deleteElements } = useReactFlow();
-  const onEdgeClick = useCallback(
-    () => deleteElements({ edges: [{ id: props.id }] }),
-    [deleteElements, props.id]
-  );
+  const onEdgeClick = useCallback(() => deleteElements({ edges: [{ id: props.id }] }), [deleteElements, props.id]);
   const { labelX, labelY, path } = useMemo(() => getPath(props), [props]);
 
   return (
@@ -26,26 +18,12 @@ export default function CustomEdge(props: EdgeProps) {
           strokeDasharray: props.selected ? 6 : 0,
         }}
       />
-      {props.selected && (
-        <EdgeRemoveBtn
-          labelX={labelX}
-          labelY={labelY}
-          onEdgeClick={onEdgeClick}
-        />
-      )}
+      {props.selected && <EdgeRemoveBtn labelX={labelX} labelY={labelY} onEdgeClick={onEdgeClick} />}
     </>
   );
 }
 
-function EdgeRemoveBtn({
-  labelX,
-  labelY,
-  onEdgeClick,
-}: {
-  labelX: number;
-  labelY: number;
-  onEdgeClick: () => void;
-}) {
+function EdgeRemoveBtn({ labelX, labelY, onEdgeClick }: { labelX: number; labelY: number; onEdgeClick: () => void }) {
   return (
     <EdgeLabelRenderer>
       <div
@@ -56,17 +34,8 @@ function EdgeRemoveBtn({
         }}
         className="nodrag nopan"
       >
-        <button
-          className="flex text-center bg-board rounded-full hover:animate-bounce p-0.5"
-          onClick={onEdgeClick}
-        >
-          <Image
-            priority
-            src="/remove.svg"
-            width={12}
-            height={12}
-            alt="remove"
-          />
+        <button className="flex text-center bg-board rounded-full hover:animate-bounce p-0.5" onClick={onEdgeClick}>
+          <Image priority src="/remove.svg" width={12} height={12} alt="remove" />
         </button>
       </div>
     </EdgeLabelRenderer>

@@ -28,42 +28,28 @@ export default function FindBlock({
         return n;
       })
     );
-  }, [text]);
+  }, [id, setNodes, text]);
 
   return (
     <>
       <Handle
-        className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -left-2 ${
-          selected && "animate-pulse"
-        }`}
+        className={`bg-line/90 border-1 border-block/90 rounded-sm w-3 h-5 -left-2 ${selected && "animate-pulse"}`}
         type="target"
         position={Position.Left}
         isConnectable={isConnectable}
       />
       <div
         onClick={() => {
-          if (inputRef.current === null)
-            throw new Error("FindBlock.onClick: inputRef.current is null");
+          if (inputRef.current === null) throw new Error("FindBlock.onClick: inputRef.current is null");
           inputRef.current.focus();
         }}
         style={{ width: data.width, height: data.height }}
         className={`bg-block/90 text-info ring-info/50 font-mono rounded-md
-                  shadow-sm ${
-                    selected && "ring-2"
-                  } transition-all duration-75 ease-in-out`}
+                  shadow-sm ${selected && "ring-2"} transition-all duration-75 ease-in-out`}
       >
-        <BlockTitle
-          title="find"
-          showRemoveBtn={selected}
-          onRemove={() => deleteElements({ nodes: [{ id }] })}
-        />
+        <BlockTitle title="find" showRemoveBtn={selected} onRemove={() => deleteElements({ nodes: [{ id }] })} />
         <div className="flex justify-center pt-1.5">
-          <Image
-            src="/find-block-icon.svg"
-            width={28}
-            height={28}
-            alt="find block icon"
-          />
+          <Image src="/find-block-icon.svg" width={28} height={28} alt="find block icon" />
         </div>
         <div className="flex mx-1 pt-2">
           <input
@@ -89,9 +75,7 @@ export default function FindBlock({
         style={{ top: nodeHeight / 4 }}
       />
       <Handle
-        className={`bg-red-600/90 border-1 border-block/90 rounded-sm w-3 h-5 -right-2 ${
-          selected && "animate-pulse"
-        }`}
+        className={`bg-red-600/90 border-1 border-block/90 rounded-sm w-3 h-5 -right-2 ${selected && "animate-pulse"}`}
         type="source"
         position={Position.Right}
         id="false"

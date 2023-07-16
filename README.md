@@ -1,34 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Automation Script Generator
 
-## Getting Started
+Single Page Application to generate Python scripts for simple GUI automation.
 
-First, run the development server:
+## How to Use?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+You start with `Start` block which is the entry point to your automation.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+If you know the location (the X and Y coordinates) of the target element on
+screen, then you should create a `Click` block and pass the arguments as the
+numbers. Do not forget to connect these two blocks.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Say you do not know the target element's coordinates, then you should use a
+`Find` block to get the parameters. `Find` block only checks whether or not the
+target element is on the screen. If it is you can use the `x,y` string as the
+arguments for the next `Click` block to click on that element.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+If some time needs to pass use `Sleep` block to delay that thread.
 
-## Learn More
+If some of the work needs to be run simultaneously, you can fork your network by
+connecting your source block to two or more blocks.
 
-To learn more about Next.js, take a look at the following resources:
+After you have created your network, click `Generate` to get Python script.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> This version does not support for loops. But since the program outputs a
+> script you can add your loops or other optimizations by hand.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## How it works?
 
-## Deploy on Vercel
+The program traverse your network and creates a Python script that utilizes the
+[`pyautogui`](pyautogui.readthedocs.io) library to realize your automation. It
+can detect forks and will create separate functions for each fork.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Disclaimer
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This tool designed to be a helper for another project of mine. I just wanted to
+share it here, also.

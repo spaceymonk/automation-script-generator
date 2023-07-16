@@ -1,12 +1,6 @@
 import Modal from "react-modal";
 
-export function AboutModal({
-  show,
-  onClose,
-}: {
-  show: boolean;
-  onClose: () => void;
-}) {
+export function AboutModal({ show, onClose }: { show: boolean; onClose: () => void }) {
   return (
     <Modal
       isOpen={show}
@@ -14,20 +8,11 @@ export function AboutModal({
       closeTimeoutMS={150}
       className="bg-app text-info font-sans rounded-2xl text-center mx-8 w-fit  md:w-96 p-5 drop-shadow-lg select-none outline-none"
     >
-      <h2 className="text-info text-center font-bold text-xl underline uppercase font-sans mb-5">
-        about
-      </h2>
+      <h2 className="text-info text-center font-bold text-xl underline uppercase font-sans mb-5">about</h2>
       <div className="mt-5">
-        <p className="my-3">
-          Create your automation workflow by creating and connecting the blocks.
-        </p>
-        <p className="my-3">
-          Click “Generate” button to get the Python script of the automation.
-        </p>
-        <p className="my-3">
-          To run the generated script you will need to setup a Python
-          environment.
-        </p>
+        <p className="my-3">Create your automation workflow by creating and connecting the blocks.</p>
+        <p className="my-3">Click “Generate” button to get the Python script of the automation.</p>
+        <p className="my-3">To run the generated script you will need to setup a Python environment.</p>
       </div>
       <p className="italic my-5">
         More details on GitHub:
