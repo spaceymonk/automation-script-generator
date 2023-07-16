@@ -2,6 +2,8 @@
 
 Single Page Application to generate Python scripts for simple GUI automation.
 
+### [Demo](https://spaceymonk.github.io/automation-script-generator/)
+
 ## How to Use?
 
 You start with `Start` block which is the entry point to your automation.
